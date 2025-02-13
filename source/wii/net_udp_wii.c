@@ -81,6 +81,7 @@ char ipaddress_text[16];
 
 int UDP_Init (void)
 {
+	net_init();
 // >>> FIX: For Nintendo Wii using devkitPPC / libogc
 // This variable is not needed in the current implementation:
 	//struct hostent *local;
@@ -108,6 +109,8 @@ int UDP_Init (void)
 		return -1;
 	};
 // <<< FIX
+
+	// ELUTODO: libogc now has net_gethosbyname
 
 	// determine my name & address
 // >>> FIX: For Nintendo Wii using devkitPPC / libogc
@@ -154,6 +157,7 @@ void UDP_Shutdown (void)
 {
 	UDP_Listen (false);
 	UDP_CloseSocket (net_controlsocket);
+	net_deinit();
 }
 
 //=============================================================================
@@ -303,17 +307,28 @@ int UDP_Connect (int socket, struct qsockaddr *addr)
 
 int UDP_CheckNewConnections (void)
 {
-	unsigned long	available;
+	bool available;
 
 	if (net_acceptsocket == -1)
 		return -1;
 
+	fd_set fdread;
+	FD_ZERO(&fdread);
+	FD_SET(net_acceptsocket, &fdread);
+
+	struct timeval timeout;
+	timeout.tv_sec = 0;
+	timeout.tv_usec = 0;
 // >>> FIX: For Nintendo Wii using devkitPPC / libogc
 // Switching to the equivalent function in the library:
 	//if (ioctl (net_acceptsocket, FIONREAD, &available) == -1)
-	if (net_ioctl (net_acceptsocket, FIONREAD, &available) < 0)
-// <<< FIX
+	//if (net_ioctl (net_acceptsocket, FIONREAD, &available) < 0)
+	if (net_select (net_acceptsocket, &fdread, NULL, NULL, &timeout) >= 0)
 		Sys_Error ("UDP: ioctlsocket (FIONREAD) failed\n");
+	else
+		available = false;
+
+	
 	if (available)
 		return net_acceptsocket;
 	return -1;
