@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // >>> FIX: For Nintendo Wii using devkitPPC / libogc
 // Including the device-specific network layer header:
-#include <network.h>
+#include <network_fixed.h>
 // <<< FIX
 
 #include "../quakedef.h"
