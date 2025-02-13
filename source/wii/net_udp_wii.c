@@ -323,7 +323,7 @@ int UDP_CheckNewConnections (void)
 // Switching to the equivalent function in the library:
 	//if (ioctl (net_acceptsocket, FIONREAD, &available) == -1)
 	//if (net_ioctl (net_acceptsocket, FIONREAD, &available) < 0)
-	if (net_select (net_acceptsocket, &fdread, NULL, NULL, &timeout) >= 0)
+	if (net_select (net_acceptsocket, &fdread, NULL, NULL, &timeout) == -1)
 		Sys_Error ("UDP: ioctlsocket (FIONREAD) failed\n");
 	else
 		available = false;
