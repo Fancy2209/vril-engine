@@ -938,7 +938,7 @@ void Key_Event (key_id_t key, qboolean down)
 		kb = keybindings[key];
 		if (kb && kb[0] == '+')
 		{
-			Q_sprintf (cmd, "-%s %i\n", kb+1, key);
+			sprintf (cmd, "-%s %i\n", kb+1, key);
 			Cbuf_AddText (cmd);
 		}
 		if (keyshift[key] != key)
@@ -946,7 +946,7 @@ void Key_Event (key_id_t key, qboolean down)
 			kb = keybindings[keyshift[key]];
 			if (kb && kb[0] == '+')
 			{
-				Q_sprintf (cmd, "-%s %i\n", kb+1, key);
+				sprintf (cmd, "-%s %i\n", kb+1, key);
 				Cbuf_AddText (cmd);
 			}
 		}

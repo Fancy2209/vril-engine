@@ -223,8 +223,8 @@ void IN_Commands (void)
 
 	if(exp_type == WPAD_EXP_NUNCHUK || exp_type == WPAD_EXP_GUITARHERO3) {
 		//Con_Printf ("Nunchuk detected..\n");
+		Cbuf_InsertText ("exec wiimote.cfg\n");
 		if(!nunchuk_connected) {
-			Cbuf_InsertText ("exec wiimote.cfg\n");
 			wpad_previous_keys = 0xf;
 		}
 
@@ -235,8 +235,8 @@ void IN_Commands (void)
 		pad_previous_keys = 0xf;
 	} else if(exp_type == WPAD_EXP_CLASSIC) {
 		//Con_Printf ("Classic Controller detected..\n");
+		Cbuf_InsertText ("exec classiccontroler.cfg\n");
 		if(!classic_connected) {
-			Cbuf_InsertText ("exec classiccontroler.cfg\n");
 			wpad_previous_keys = 0xf;
 		}
 
@@ -247,8 +247,8 @@ void IN_Commands (void)
 		pad_previous_keys = 0xf;
 	} else {
 		//Here neither the classic controller nor the nuncunk are connected
+		Cbuf_InsertText ("exec gamecube.cfg\n");
 		if(classic_connected || nunchuk_connected) {
-			Cbuf_InsertText ("exec gamecube.cfg\n");
 			wpad_previous_keys = 0xf;
 		}
 
@@ -257,13 +257,11 @@ void IN_Commands (void)
 		pad_keys = PAD_ButtonsHeld(PAD_CHAN0);
 		wpad_keys = WPAD_ButtonsHeld(WPAD_CHAN_0);
 	}
-	
-	if(wiimote_connected) {
-		WPAD_IR(WPAD_CHAN_0, &pointer);
-		WPAD_Orientation(WPAD_CHAN_0, &orientation);
-		WPAD_Expansion(WPAD_CHAN_0, &expansion);
-		WPAD_GForce(WPAD_CHAN_0, &gforce); //Shake to reload
-	}
+
+	WPAD_IR(WPAD_CHAN_0, &pointer);
+	WPAD_Orientation(WPAD_CHAN_0, &orientation);
+	WPAD_Expansion(WPAD_CHAN_0, &expansion);
+	WPAD_GForce(WPAD_CHAN_0, &gforce); //Shake to reload
 
 	if(classic_connected) {
 		//Send the wireless classic controller buttons events
