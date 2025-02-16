@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 
 See the GNU General Public License for more details.
 
@@ -27,12 +27,8 @@ key up events are sent even if in console mode
 */
 
 
-#define      HISTORY_FILE_NAME   "nzp/nzp_log.txt"
-
-#define      MAXCMDLINE   256
-#define      CMDLINES   32
-
-char   key_lines[CMDLINES][MAXCMDLINE];
+#define		MAXCMDLINE	256
+char	key_lines[32][MAXCMDLINE];
 int		key_linepos;
 int		shift_down=false;
 int		key_lastpress;
@@ -576,7 +572,7 @@ void Key_SetBinding (key_id_t keynum, char *binding)
 // allocate memory for new binding
 	l = Q_strlen (binding);	
 	new = Z_Malloc (l+1);
-	strcpy (new, binding);
+	Q_strcpy (new, binding);
 	new[l] = 0;
 	keybindings[keynum] = new;	
 }
@@ -602,9 +598,9 @@ void Key_SetDTBinding (int keynum, char *binding)
 	}
 
 // allocate memory for new binding
-	l = strlen (binding);
+	l = Q_strlen (binding);
 	new = Z_Malloc (l+1);
-	strcpy (new, binding);
+	Q_strcpy (new, binding);
 	new[l] = 0;
 	dtbindings[keynum] = new;
 }
@@ -653,7 +649,7 @@ void Key_Bind_f (void)
 {
 	int			i, c, b;
 	char		cmd[1024];
-
+	
 	c = Cmd_Argc();
 
 	if (c != 2 && c != 3)
@@ -768,66 +764,6 @@ void Key_WriteDTBindings (FILE *f)
 				fprintf (f, "binddt \"%s\" \"%s\"\n", Key_KeynumToString(i), dtbindings[i]);
 }
 
-// Added by dr_mabuse1981 {
-void History_Init (void)
-{
-   int i, c;
-   FILE *hf;
-
-   for (i = 0; i < CMDLINES; i++) {
-      key_lines[i][0] = ']';
-      key_lines[i][1] = 0;
-   }
-   key_linepos = 1;
-
-//   if (cl_savehistory.value)
-      if ((hf = fopen(HISTORY_FILE_NAME, "rt")))
-      {
-         do
-         {
-            i = 1;
-            do
-            {
-               c = fgetc(hf);
-               key_lines[edit_line][i++] = c;
-            } while (c != '\n' && c != EOF && i < MAXCMDLINE);
-            key_lines[edit_line][i - 1] = 0;
-            edit_line = (edit_line + 1) & (CMDLINES - 1);
-         } while (c != EOF && edit_line < CMDLINES);
-         fclose(hf);
-
-         history_line = edit_line = (edit_line - 1) & (CMDLINES - 1);
-         key_lines[edit_line][0] = ']';
-         key_lines[edit_line][1] = 0;
-      }
-}
-
-void History_Shutdown (void)
-{
-   int i;
-   FILE *hf;
-
-//   if (cl_savehistory.value)
-      if ((hf = fopen(HISTORY_FILE_NAME, "wt")))
-      {
-         i = edit_line;
-         do
-         {
-            i = (i + 1) & (CMDLINES - 1);
-         } while (i != edit_line && !key_lines[i][1]);
-
-         do
-         {
-            // fprintf(hf, "%s\n", wcs2str(key_lines[i] + 1)); // Baker: I commented this line out because byte colored text isn't a feature in most ordinary engines
-            fprintf(hf, "%s\n", key_lines[i] + 1);
-            i = (i + 1) & (CMDLINES - 1);
-         } while (i != edit_line && key_lines[i][1]);
-         fclose(hf);
-      }
-}
-// } Added by dr_mabuse1981
-
-
 /*
 ===================
 Key_Init
@@ -837,21 +773,18 @@ void Key_Init (void)
 {
 	int		i;
 
-	History_Init ();
-
-	#if 0 // This section of code is now done in History_Init
 	for (i=0 ; i<32 ; i++)
 	{
 		key_lines[i][0] = ']';
 		key_lines[i][1] = 0;
 	}
 	key_linepos = 1;
-	#endif
+	
 //
 // init ascii characters in console mode
 //
 	for (i=32 ; i<128 ; i++)
-	consolekeys[i] = true;
+		consolekeys[i] = true;
 	consolekeys[K_ENTER] = true;
 	consolekeys[K_TAB] = true;
 	consolekeys[K_LEFTARROW] = true;
@@ -934,6 +867,8 @@ void Key_Event (key_id_t key, qboolean down)
 	keydown[key] = down;
 	lastkey = key;
 
+	keydown[key] = down;
+
 	if (!down)
 		key_repeats[key] = 0;
 
@@ -954,7 +889,7 @@ void Key_Event (key_id_t key, qboolean down)
 		{
 			return;	// ignore most autorepeats
 		}
-
+			
 		if (key >= 200 && !keybindings[key])
 			Con_Printf ("%s is unbound, hit START to set.\n", Key_KeynumToString (key) );
 	}
@@ -1054,19 +989,19 @@ void Key_Event (key_id_t key, qboolean down)
 			lastkey = 0;
 		}
 
-			kb = keybindings[key];
-			if (kb)
+		kb = keybindings[key];
+		if (kb)
+		{
+			if (kb[0] == '+')
+			{	// button commands add keynum as a parm
+				sprintf (cmd, "%s %i\n", kb, key);
+				Cbuf_AddText (cmd);
+			}
+			else
 			{
-				if (kb[0] == '+')
-				{	// button commands add keynum as a parm
-					sprintf (cmd, "%s %i\n", kb, key);
-					Cbuf_AddText (cmd);
-				}
-				else
-				{
-					Cbuf_AddText (kb);
-					Cbuf_AddText ("\n");
-				}
+				Cbuf_AddText (kb);
+				Cbuf_AddText ("\n");
+			}
 		}
 		return;
 	}

@@ -22,6 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 extern u32 wiimote_ir_res_x;
 extern u32 wiimote_ir_res_y;
-extern u32 exp_type;
+extern bool wiimote_connected;
+extern bool nunchuk_connected;
+extern bool classic_connected;
 
 #endif /* __INPUT_WIIMOTE_H__ */

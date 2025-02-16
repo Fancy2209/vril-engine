@@ -179,7 +179,7 @@ void IN_UseDown (void) {
 	// this is not ideal for a number of reasons :/
 	// 
 
-	if(exp_type == WPAD_EXP_NUNCHUK || exp_type == WPAD_EXP_GUITARHERO3) {
+	if(nunchuk_connected) {
 		if (scr_usetime_off <= 0) {
 			KeyDown(&in_vlock);
 		}

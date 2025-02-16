@@ -2104,19 +2104,12 @@ void M_Options_Key (int k)
 			break;
 		case 2:
 			Cbuf_AddText ("exec default.cfg\n");
-			switch(exp_type) {
-				case WPAD_EXP_NUNCHUK:
-				case WPAD_EXP_GUITARHERO3:
-					Cbuf_InsertText ("exec wiimote.cfg\n");
-					break;
-				case WPAD_EXP_CLASSIC:
-					Cbuf_InsertText ("exec classiccontroller.cfg\n");
-					break;
-				default:
-					Cbuf_InsertText ("exec gamecube.cfg\n");
-					break;
-			}
-			break;
+			if(nunchuk_connected)
+				Cbuf_InsertText ("exec wiimote.cfg\n");
+			else if(classic_connected)
+				Cbuf_InsertText ("exec classiccontroller.cfg\n");
+			else
+				Cbuf_InsertText ("exec classiccontroller.cfg\n");
 		default:
 			M_AdjustSliders (1);
 			break;

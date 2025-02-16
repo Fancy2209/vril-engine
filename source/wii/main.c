@@ -247,10 +247,12 @@ int main(int argc, char* argv[])
 		Host_Frame(current_time - last_time);
 		last_time = current_time;
 		
-		if (rumble_on&&(current_time > time_wpad_off)) 
+		if (rumble_on && (current_time > time_wpad_off)) 
 		{
-			PAD_ControlMotor(0, false);
-			WPAD_Rumble(0, false);
+			if(!nunchuk_connected && !classic_connected)
+				PAD_ControlMotor(0, false);
+			else
+				WPAD_Rumble(0, false);
 			rumble_on = 0;
 		}
 		

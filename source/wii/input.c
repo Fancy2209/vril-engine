@@ -47,7 +47,6 @@ u32 wiimote_ir_res_y;
 // wiimote info
 u32 wpad_previous_keys = 0xf;
 u32 wpad_keys = 0xf;
-u32 exp_type;
 
 ir_t pointer;
 orient_t orientation;
@@ -211,6 +210,7 @@ void IN_Commands (void)
 	// and assigns the pressed buttons to wpad_keys (wiimote/classic) and pad_keys (gamecube)
 	
 	int err;
+	u32 exp_type;
 
 	err = WPAD_Probe(WPAD_CHAN_0, &exp_type);
 
