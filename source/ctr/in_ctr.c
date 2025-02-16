@@ -238,3 +238,8 @@ void IN_SwitchKeyboard(void)
 
 	Cbuf_AddText(va("%s\n", console_buffer));
 }
+
+void IN_Rumble (int low_frequency, int high_frequency, int duration) 
+{
+	// Dummy func, platform has no rumble
+}

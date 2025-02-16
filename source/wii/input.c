@@ -47,6 +47,7 @@ u32 wiimote_ir_res_y;
 // wiimote info
 u32 wpad_previous_keys = 0xf;
 u32 wpad_keys = 0xf;
+u32 exp_type;
 
 ir_t pointer;
 orient_t orientation;
@@ -209,14 +210,20 @@ void IN_Commands (void)
 	// Manages the nunchunk or classic controller connection
 	// and assigns the pressed buttons to wpad_keys (wiimote/classic) and pad_keys (gamecube)
 	
-	u32 exp_type;
-	if ( WPAD_Probe(WPAD_CHAN_0, &exp_type) != 0 ) {
-		Con_Printf ("No controller detected!\n");
+	int err;
+
+	err = WPAD_Probe(WPAD_CHAN_0, &exp_type);
+
+	// This looks weird but from my research is what the WiiU Pro Controller does
+	if ( err == WPAD_ERR_NONE && exp_type != WPAD_EXP_CLASSIC) {
+		wiimote_connected = false;
+		// Con_Printf ("No controller detected!\n");
 		exp_type = WPAD_EXP_NONE;
 	}
 
-	if(exp_type == WPAD_EXP_NUNCHUK) {
+	if(exp_type == WPAD_EXP_NUNCHUK || exp_type == WPAD_EXP_GUITARHERO3) {
 		//Con_Printf ("Nunchuk detected..\n");
+		Cbuf_InsertText ("exec wiimote.cfg\n");
 		if(!nunchuk_connected) {
 			wpad_previous_keys = 0xf;
 		}
@@ -227,7 +234,8 @@ void IN_Commands (void)
 		pad_keys = 0xf;
 		pad_previous_keys = 0xf;
 	} else if(exp_type == WPAD_EXP_CLASSIC) {
-		//Con_Printf ("Classic controller detected..\n");
+		Cbuf_InsertText ("exec classiccontroler.cfg\n");
+		//Con_Printf ("Classic Controller detected..\n");
 		if(!classic_connected) {
 			wpad_previous_keys = 0xf;
 		}
@@ -238,6 +246,7 @@ void IN_Commands (void)
 		pad_keys = 0xf;
 		pad_previous_keys = 0xf;
 	} else {
+		Cbuf_InsertText ("exec gamecube.cfg\n");
 		//Here neither the classic controller nor the nuncunk are connected
 		if(classic_connected || nunchuk_connected) {
 			wpad_previous_keys = 0xf;
@@ -249,10 +258,12 @@ void IN_Commands (void)
 		wpad_keys = WPAD_ButtonsHeld(WPAD_CHAN_0);
 	}
 	
-	WPAD_IR(WPAD_CHAN_0, &pointer);
-	WPAD_Orientation(WPAD_CHAN_0, &orientation);
-	WPAD_Expansion(WPAD_CHAN_0, &expansion);
-	WPAD_GForce(WPAD_CHAN_0, &gforce); //Shake to reload
+	if(wiimote_connected) {
+		WPAD_IR(WPAD_CHAN_0, &pointer);
+		WPAD_Orientation(WPAD_CHAN_0, &orientation);
+		WPAD_Expansion(WPAD_CHAN_0, &expansion);
+		WPAD_GForce(WPAD_CHAN_0, &gforce); //Shake to reload
+	}
 
 	if(classic_connected) {
 		//Send the wireless classic controller buttons events
@@ -508,7 +519,7 @@ void IN_Commands (void)
 
 		if ((pad_previous_keys & PAD_BUTTON_START) != (pad_keys & PAD_BUTTON_START)) {
 			// Send a press event.
-			Key_Event(K_ESCAPE, ((pad_keys & PAD_BUTTON_START) == PAD_BUTTON_START));
+			Key_Event(K_JOY27, ((pad_keys & PAD_BUTTON_START) == PAD_BUTTON_START));
 		}
 		pad_previous_keys = pad_keys;
 	}
@@ -761,14 +772,18 @@ void IN_Move (usercmd_t *cmd)
 
 extern double time_wpad_off;
 extern int rumble_on;
-void Wiimote_Rumble (int low_frequency, int high_frequency, int duration) {
+void IN_Rumble (int low_frequency, int high_frequency, int duration) 
+{
 	if (!rumble.value) return;
 	double rumble_time;
 	rumble_time = duration / 1000.0;
 	//low frequency and high frequency not used for wiimote. read them anyways
 	
 	//it switches rumble on for rumble_time milliseconds  
-	WPAD_Rumble(0, true);
+	if(!nunchuk_connected && !classic_connected)
+		PAD_ControlMotor(0, true);
+	else
+		WPAD_Rumble(0, true);
 	rumble_on=1;
 	time_wpad_off = Sys_FloatTime() + rumble_time;
 }

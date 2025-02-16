@@ -249,6 +249,7 @@ int main(int argc, char* argv[])
 		
 		if (rumble_on&&(current_time > time_wpad_off)) 
 		{
+			PAD_ControlMotor(0, false);
 			WPAD_Rumble(0, false);
 			rumble_on = 0;
 		}

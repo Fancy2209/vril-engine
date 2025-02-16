@@ -23,6 +23,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // rights reserved.
 
 #include "quakedef.h"
+#ifdef __WII__
+#include "wii/input_wiimote.h"
+#include <wiiuse/wpad.h>
+#endif 
 
 /*
 ===============================================================================
@@ -174,14 +178,17 @@ void IN_UseDown (void) {
 	// 3 binds all hardcoded to '+ use'
 	// this is not ideal for a number of reasons :/
 	// 
-	if (scr_usetime_off <= 0) {
-		KeyDown(&in_vlock);
-	}
-	// if moving HACK
-	if (croshhairmoving == 1) {
-		if (cl.stats[STAT_ZOOM] != 1 && cl.stats[STAT_ZOOM] != 2) {
-			KeyUp(&in_vlock);
-			Cbuf_AddText("impulse 23\n"); // sprinting impulse - "impulse 23"
+
+	if(exp_type == WPAD_EXP_NUNCHUK || exp_type == WPAD_EXP_GUITARHERO3) {
+		if (scr_usetime_off <= 0) {
+			KeyDown(&in_vlock);
+		}
+		// if moving HACK
+		if (croshhairmoving == 1) {
+			if (cl.stats[STAT_ZOOM] != 1 && cl.stats[STAT_ZOOM] != 2) {
+				KeyUp(&in_vlock);
+				Cbuf_AddText("impulse 23\n"); // sprinting impulse - "impulse 23"
+			}
 		}
 	}
 #endif

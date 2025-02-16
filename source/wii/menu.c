@@ -18,6 +18,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 #include "../quakedef.h"
+#include "input_wiimote.h"
+#include <wiiuse/wpad.h>
 
 enum 
 {
@@ -437,6 +439,8 @@ static void M_Paused_Menu_Key (int key)
 		case K_BACKSPACE:
 		case K_ESCAPE:
 		case K_JOY1:
+		case K_JOY10:
+		case K_JOY21:
 			S_LocalSound ("sounds/menu/enter.wav");
 			Cbuf_AddText("togglemenu\n");
 			break;
@@ -454,7 +458,9 @@ static void M_Paused_Menu_Key (int key)
 			break;
 
 		case K_ENTER:
-		case K_JOY0:
+		case K_JOY0: // Wiimote A
+		case K_JOY9: // CC A
+		case K_JOY20: // GC Ac
 			m_entersound = true;
 
 			switch (M_Paused_Cusor)
@@ -540,8 +546,10 @@ void M_Credits_Key (int key)
 	switch (key)
 	{
 		case K_ENTER:
-		case K_JOY0:
-		case K_JOY1:
+		case K_JOY0: // Wiimote A
+		case K_JOY1: // Wiimote B
+		case K_JOY9: // CC A
+		case K_JOY20: // GC A
             M_Menu_Main_f ();
             break;
 	}
@@ -577,7 +585,9 @@ void M_Restart_Key (int key)
 	switch (key)
 	{
 	case K_ESCAPE:
-	case K_JOY1:
+	case K_JOY1: // Wiimote B
+	case K_JOY10: // CC B
+	case K_JOY21: // GC B
 	case 'n':
 	case 'N':
 		m_state = m_paused_menu;
@@ -587,7 +597,9 @@ void M_Restart_Key (int key)
 	case 'Y':
 	case 'y':
 	case K_ENTER:
-	case K_JOY0:
+	case K_JOY0: // Wiimote A
+	case K_JOY9: // CC A
+	case K_JOY20: // GC A
 		key_dest = key_game;
 		m_state = m_none;
 		// Cbuf_AddText ("restart\n"); // nai -- old, now do soft reset
@@ -644,6 +656,8 @@ void M_Exit_Key (int key)
 	{
 	case K_ESCAPE:
 	case K_JOY1:
+	case K_JOY10:
+	case K_JOY21:
 	case 'n':
 	case 'N':
 		m_state = m_paused_menu;
@@ -653,7 +667,9 @@ void M_Exit_Key (int key)
 	case 'Y':
 	case 'y':
 	case K_ENTER:
-	case K_JOY0:
+	case K_JOY0: // Wiimote A
+	case K_JOY9: // CC A
+	case K_JOY20: // GC A
 		Cbuf_AddText("disconnect\n");
 		CL_ClearState ();
 		M_Menu_Main_f();
@@ -710,8 +726,12 @@ void M_Start_Key (int key)
 {
 	switch (key)
 	{
-		case K_JOY0:
-		case K_JOY5:
+		case K_JOY0: // Wiimote A
+		case K_JOY5: // Wiimote Plus
+		case K_JOY9: // CC A
+		case K_JOY18: // CC Plus
+		case K_JOY20: // GC A
+		case K_JOY27: // GC Start
 			S_LocalSound ("sounds/menu/enter.wav");
 			Cbuf_AddText("cd playstring tensioned_by_the_damned 1\n");
 			Cbuf_AddText("togglemenu\n");
@@ -838,9 +858,9 @@ void M_Main_Key (int key)
 		break;
 
 	case K_ENTER:
-	case K_JOY0:
-	case K_JOY9:
-	case K_JOY20:
+	case K_JOY0: // Wiimote A
+	case K_JOY9: // CC A
+	case K_JOY20: // GC A
 		m_entersound = true;
 
 		switch (m_main_cursor)
@@ -1018,9 +1038,9 @@ void M_SinglePlayer_Key (int key)
 		break;
 
 	case K_ENTER:
-	case K_JOY0:
-	case K_JOY9:
-	case K_JOY20:
+	case K_JOY0: // Wiimote A
+	case K_JOY9: // CC A
+	case K_JOY20: // GC A
 		m_entersound = true;
 
 		switch (m_singleplayer_cursor)
@@ -1086,6 +1106,8 @@ void M_SinglePlayer_Key (int key)
 	case K_BACKSPACE:
 	case K_ESCAPE:
 	case K_JOY1:
+	case K_JOY10:
+	case K_JOY21:
 		M_Menu_Main_f();
 		break;
 	}
@@ -1374,6 +1396,8 @@ void M_Menu_CustomMaps_Key (int key)
 	{
 		case K_ESCAPE:
 		case K_JOY1:
+		case K_JOY10:
+		case K_JOY21:
 			M_Menu_SinglePlayer_f ();
 			break;
 		case K_DOWNARROW:
@@ -1418,7 +1442,9 @@ void M_Menu_CustomMaps_Key (int key)
 			}
 			break;
 		case K_ENTER:
-		case K_JOY0:
+		case K_JOY0: // Wiimote A
+		case K_JOY9: // CC A
+		case K_JOY20: // GC A
 			m_entersound = true;
 			if (m_map_cursor == 17) {
 				M_Menu_SinglePlayer_f ();
@@ -1507,9 +1533,9 @@ void M_MultiPlayer_Key (int key)
 		break;
 
 	case K_ENTER:
-	case K_JOY0:
-	case K_JOY9:
-	case K_JOY20:
+	case K_JOY0: // Wiimote A
+	case K_JOY9: // CC A
+	case K_JOY20: // GC A
 		m_entersound = true;
 		switch (m_multiplayer_cursor)
 		{
@@ -1642,9 +1668,9 @@ forward:
 		break;
 
 	case K_ENTER:
-	case K_JOY0:
-	case K_JOY9:
-	case K_JOY20:
+	case K_JOY0: // Wiimote A
+	case K_JOY9: // CC A
+	case K_JOY20: // GC A
 		if (setup_cursor == 0 || setup_cursor == 1)
 			return;
 
@@ -1834,9 +1860,9 @@ again:
 		break;
 
 	case K_ENTER:
-	case K_JOY0:
-	case K_JOY9:
-	case K_JOY20:
+	case K_JOY0: // Wiimote A
+	case K_JOY9: // CC A
+	case K_JOY20: // GC A
 		m_entersound = true;
 
 		switch (m_net_cursor)
@@ -2061,9 +2087,9 @@ void M_Options_Key (int k)
 	switch (k)
 	{	
 	case K_ENTER:
-	case K_JOY0:
-	case K_JOY9:
-	case K_JOY20:
+	case K_JOY0: // Wiimote A
+	case K_JOY9: // CC A
+	case K_JOY20: // GC A
 		m_entersound = true;
 		switch (options_cursor)
 		{
@@ -2078,6 +2104,18 @@ void M_Options_Key (int k)
 			break;
 		case 2:
 			Cbuf_AddText ("exec default.cfg\n");
+			switch(exp_type) {
+				case WPAD_EXP_NUNCHUK:
+				case WPAD_EXP_GUITARHERO3:
+					Cbuf_InsertText ("exec wiimote.cfg\n");
+					break;
+				case WPAD_EXP_CLASSIC:
+					Cbuf_InsertText ("exec classiccontroller.cfg\n");
+					break;
+				default:
+					Cbuf_InsertText ("exec gamecube.cfg\n");
+					break;
+			}
 			break;
 		default:
 			M_AdjustSliders (1);
@@ -2101,7 +2139,9 @@ void M_Options_Key (int k)
 		
 	case K_ESCAPE:
 	case K_JOY1:
-		if (key_dest == key_menu_pause)
+	case K_JOY10:
+	case K_JOY21:
+			if (key_dest == key_menu_pause)
 			M_Paused_Menu_f();
 		else
 			M_Menu_Main_f ();
@@ -2298,9 +2338,9 @@ void M_Keys_Key (int k)
 		break;
 
 	case K_ENTER:   // go into bind mode
-	case K_JOY0:
-	case K_JOY9:
-	case K_JOY20:
+	case K_JOY0: // Wiimote A
+	case K_JOY9: // CC A
+	case K_JOY20: // GC A
 		M_FindKeysForCommand (bindnames[keys_cursor][0], keys);
 		//S_LocalSound ("misc/menu2.wav");
 		if (keys[1] != -1)
@@ -2510,9 +2550,9 @@ void M_Quit_Key (int key)
 		break;
 
 	case K_ENTER:
-	case K_JOY0:
-	case K_JOY9:
-	case K_JOY20:
+	case K_JOY0: // Wiimote A
+	case K_JOY9: // CC A
+	case K_JOY20: // GC A
 	case 'Y':
 	case 'y':
 		key_dest = key_console;
@@ -2661,9 +2701,9 @@ void M_LanConfig_Key (int key)
 		break;
 
 	case K_ENTER:
-	case K_JOY0:
-	case K_JOY9:
-	case K_JOY20:
+	case K_JOY0: // Wiimote A
+	case K_JOY9: // CC A
+	case K_JOY20: // GC A
 		if (lanConfig_cursor == 0)
 			break;
 
@@ -3187,9 +3227,9 @@ void M_GameOptions_Key (int key)
 		break;
 
 	case K_ENTER:
-	case K_JOY0:
-	case K_JOY9:
-	case K_JOY20:
+	case K_JOY0: // Wiimote A
+	case K_JOY9: // CC A
+	case K_JOY20: // GC A
 		//S_LocalSound ("misc/menu2.wav");
 		if (gameoptions_cursor == 0)
 		{
@@ -3368,9 +3408,9 @@ void M_ServerList_Key (int k)
 		break;
 
 	case K_ENTER:
-	case K_JOY0:
-	case K_JOY9:
-	case K_JOY20:
+	case K_JOY0: // Wiimote A
+	case K_JOY9: // CC A
+	case K_JOY20: // GC A
 		//S_LocalSound ("misc/menu2.wav");
 		m_return_state = m_state;
 		m_return_onerror = true;

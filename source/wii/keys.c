@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -27,8 +27,12 @@ key up events are sent even if in console mode
 */
 
 
-#define		MAXCMDLINE	256
-char	key_lines[64][MAXCMDLINE];
+#define      HISTORY_FILE_NAME   "nzp/nzp_log.txt"
+
+#define      MAXCMDLINE   256
+#define      CMDLINES   32
+
+char   key_lines[CMDLINES][MAXCMDLINE];
 int		key_linepos;
 int		shift_down=false;
 int		key_lastpress;
@@ -46,8 +50,6 @@ qboolean	consolekeys[256];	// if true, can't be rebound while in console
 qboolean	menubound[256];	// if true, can't be rebound while in menu
 int		keyshift[256];		// key to map to if shift held down in console
 int		key_repeats[256];	// if > 1, it is autorepeating
-qboolean	keydown[256];
-
 qboolean	keydown[KEY_COUNT];
 
 extern bool nunchuk_connected;
@@ -651,7 +653,7 @@ void Key_Bind_f (void)
 {
 	int			i, c, b;
 	char		cmd[1024];
-	
+
 	c = Cmd_Argc();
 
 	if (c != 2 && c != 3)
@@ -766,6 +768,66 @@ void Key_WriteDTBindings (FILE *f)
 				fprintf (f, "binddt \"%s\" \"%s\"\n", Key_KeynumToString(i), dtbindings[i]);
 }
 
+// Added by dr_mabuse1981 {
+void History_Init (void)
+{
+   int i, c;
+   FILE *hf;
+
+   for (i = 0; i < CMDLINES; i++) {
+      key_lines[i][0] = ']';
+      key_lines[i][1] = 0;
+   }
+   key_linepos = 1;
+
+//   if (cl_savehistory.value)
+      if ((hf = fopen(HISTORY_FILE_NAME, "rt")))
+      {
+         do
+         {
+            i = 1;
+            do
+            {
+               c = fgetc(hf);
+               key_lines[edit_line][i++] = c;
+            } while (c != '\n' && c != EOF && i < MAXCMDLINE);
+            key_lines[edit_line][i - 1] = 0;
+            edit_line = (edit_line + 1) & (CMDLINES - 1);
+         } while (c != EOF && edit_line < CMDLINES);
+         fclose(hf);
+
+         history_line = edit_line = (edit_line - 1) & (CMDLINES - 1);
+         key_lines[edit_line][0] = ']';
+         key_lines[edit_line][1] = 0;
+      }
+}
+
+void History_Shutdown (void)
+{
+   int i;
+   FILE *hf;
+
+//   if (cl_savehistory.value)
+      if ((hf = fopen(HISTORY_FILE_NAME, "wt")))
+      {
+         i = edit_line;
+         do
+         {
+            i = (i + 1) & (CMDLINES - 1);
+         } while (i != edit_line && !key_lines[i][1]);
+
+         do
+         {
+            // fprintf(hf, "%s\n", wcs2str(key_lines[i] + 1)); // Baker: I commented this line out because byte colored text isn't a feature in most ordinary engines
+            fprintf(hf, "%s\n", key_lines[i] + 1);
+            i = (i + 1) & (CMDLINES - 1);
+         } while (i != edit_line && key_lines[i][1]);
+         fclose(hf);
+      }
+}
+// } Added by dr_mabuse1981
+
+
 /*
 ===================
 Key_Init
@@ -775,18 +837,21 @@ void Key_Init (void)
 {
 	int		i;
 
+	History_Init ();
+
+	#if 0 // This section of code is now done in History_Init
 	for (i=0 ; i<32 ; i++)
 	{
 		key_lines[i][0] = ']';
 		key_lines[i][1] = 0;
 	}
 	key_linepos = 1;
-	
+	#endif
 //
 // init ascii characters in console mode
 //
 	for (i=32 ; i<128 ; i++)
-		consolekeys[i] = true;
+	consolekeys[i] = true;
 	consolekeys[K_ENTER] = true;
 	consolekeys[K_TAB] = true;
 	consolekeys[K_LEFTARROW] = true;
@@ -841,6 +906,7 @@ void Key_Init (void)
 // register our functions
 //
 	Cmd_AddCommand ("bind",Key_Bind_f);
+	Cmd_AddCommand ("binddt",Key_Binddt_f);
 	Cmd_AddCommand ("unbind",Key_Unbind_f);
 	Cmd_AddCommand ("unbindall",Key_Unbindall_f);
 
@@ -855,12 +921,18 @@ Called by the system between frames for both key up and key down events
 Should NOT be called during an interrupt!
 ===================
 */
+int lastkey;
+double lastkeytime;
+int oldkey;
+double oldkeytime;
 void Key_Event (key_id_t key, qboolean down)
 {
 	char	*kb;
 	char	cmd[1024];
 
+	oldkey = lastkey;
 	keydown[key] = down;
+	lastkey = key;
 
 	if (!down)
 		key_repeats[key] = 0;
@@ -875,14 +947,16 @@ void Key_Event (key_id_t key, qboolean down)
 // update auto-repeat status
 	if (down)
 	{
+		oldkeytime = lastkeytime;
+		lastkeytime = Sys_FloatTime();
 		key_repeats[key]++;
 		if (key != K_BACKSPACE && key != K_PAUSE && key_repeats[key] > 1)
 		{
 			return;	// ignore most autorepeats
 		}
-			
-		if (key >= K_BACKSPACE && !keybindings[key])
-			Con_Printf ("%s is unbound, use the options screen to set.\n", Key_KeynumToString (key) );
+
+		if (key >= 200 && !keybindings[key])
+			Con_Printf ("%s is unbound, hit START to set.\n", Key_KeynumToString (key) );
 	}
 
 	if (key == K_SHIFT)
@@ -891,8 +965,7 @@ void Key_Event (key_id_t key, qboolean down)
 //
 // handle escape specialy, so the user can never unbind it
 //
-	/*
-	if (key == K_JOY1)
+	if (key == K_ESCAPE)
 	{
 		if (!down)
 			return;
@@ -906,7 +979,6 @@ void Key_Event (key_id_t key, qboolean down)
 			M_Keydown (key);
 			break;
 		case key_game:
-			break;
 		case key_console:
 			console_enabled = false;
 			M_ToggleMenu_f ();
@@ -916,7 +988,7 @@ void Key_Event (key_id_t key, qboolean down)
 		}
 		return;
 	}
-	*/
+
 //
 // key up events only generate commands if the game key binding is
 // a button command (leading + sign).  These will occur even in console mode,
@@ -956,27 +1028,49 @@ void Key_Event (key_id_t key, qboolean down)
 //
 // if not a consolekey, send to the interpreter no matter what mode is
 //
-	if ((key_dest == key_menu && menubound[key]) ||
-	    (key_dest == key_console && !consolekeys[key]) ||
-	    (key_dest == key_game && (!con_forcedup || !consolekeys[key])))
+	if ( ((key_dest == key_menu || key_dest == key_menu_pause) && menubound[key])
+	|| (key_dest == key_console && !consolekeys[key])
+	|| (key_dest == key_game && ( !con_forcedup || !consolekeys[key] ) ) )
 	{
-		kb = keybindings[key];
-		if (kb)
+		if (oldkey == key && ((oldkeytime + 0.3) > lastkeytime))
 		{
-			if (kb[0] == '+')
-			{	// button commands add keynum as a parm
-				sprintf (cmd, "%s %i\n", kb, key);
-				Cbuf_AddText (cmd);
-			}
-			else
+			kb = dtbindings[key];
+			if (kb)
 			{
-				Cbuf_AddText (kb);
-				Cbuf_AddText ("\n");
+				if (kb[0] == '+')
+				{	// button commands add keynum as a parm
+					sprintf (cmd, kb, key);
+					Cbuf_AddText (cmd);
+				}
+				else
+				{
+					Cbuf_AddText (kb);
+					Cbuf_AddText ("\n");
+				}
 			}
+			oldkey = 0;
+			oldkeytime = 0;
+			lastkeytime = 0;
+			lastkey = 0;
+		}
+
+			kb = keybindings[key];
+			if (kb)
+			{
+				if (kb[0] == '+')
+				{	// button commands add keynum as a parm
+					sprintf (cmd, "%s %i\n", kb, key);
+					Cbuf_AddText (cmd);
+				}
+				else
+				{
+					Cbuf_AddText (kb);
+					Cbuf_AddText ("\n");
+				}
 		}
 		return;
 	}
-	
+
 	if (!down)
 		return;		// other systems only care about key down events
 
@@ -984,23 +1078,23 @@ void Key_Event (key_id_t key, qboolean down)
 	{
 		key = keyshift[key];
 	}
+
 	switch (key_dest)
 	{
-		case key_message:
-			Key_Message (key);
-			break;
-		case key_menu:
-		case key_menu_pause:
-			M_Keydown (key);
-			break;
+	case key_message:
+		Key_Message (key);
+		break;
+	case key_menu:
+	case key_menu_pause:
+		M_Keydown (key);
+		break;
 
-		case key_game:
-		case key_console: {
-			Key_Console (key);
-			break;
-		}
-		default:
-			Sys_Error ("Bad key_dest");
+	case key_game:
+	case key_console:
+		Key_Console (key);
+		break;
+	default:
+		Sys_Error ("Bad key_dest");
 	}
 }
 

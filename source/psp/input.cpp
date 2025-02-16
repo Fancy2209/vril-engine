@@ -360,3 +360,8 @@ void IN_Move (usercmd_t *cmd)
 		cmd->forwardmove -= cl_forwardspeed * y;
 	}
 }
+
+void IN_Rumble (int low_frequency, int high_frequency, int duration) 
+{
+	// Dummy func, platform has no rumble
+}
