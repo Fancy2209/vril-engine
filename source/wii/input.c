@@ -55,8 +55,8 @@ nunchuk_t nunchuk;
 gforce_t gforce;//Nunchuk shake
 
 bool wiimote_connected = true;
-bool nunchuk_connected = false;
-bool classic_connected = false;
+bool nunchuk_connected = true;
+bool classic_connected = true;
 bool keyboard_connected = false;
 
 typedef enum  {LEFT, CENTER_X, RIGHT} stick_x_st_t;
@@ -223,8 +223,8 @@ void IN_Commands (void)
 
 	if(exp_type == WPAD_EXP_NUNCHUK || exp_type == WPAD_EXP_GUITARHERO3) {
 		//Con_Printf ("Nunchuk detected..\n");
-		Cbuf_InsertText ("exec wiimote.cfg\n");
 		if(!nunchuk_connected) {
+			Cbuf_InsertText ("exec wiimote.cfg\n");
 			wpad_previous_keys = 0xf;
 		}
 
@@ -234,9 +234,9 @@ void IN_Commands (void)
 		pad_keys = 0xf;
 		pad_previous_keys = 0xf;
 	} else if(exp_type == WPAD_EXP_CLASSIC) {
-		Cbuf_InsertText ("exec classiccontroler.cfg\n");
 		//Con_Printf ("Classic Controller detected..\n");
 		if(!classic_connected) {
+			Cbuf_InsertText ("exec classiccontroler.cfg\n");
 			wpad_previous_keys = 0xf;
 		}
 
@@ -246,9 +246,9 @@ void IN_Commands (void)
 		pad_keys = 0xf;
 		pad_previous_keys = 0xf;
 	} else {
-		Cbuf_InsertText ("exec gamecube.cfg\n");
 		//Here neither the classic controller nor the nuncunk are connected
 		if(classic_connected || nunchuk_connected) {
+			Cbuf_InsertText ("exec gamecube.cfg\n");
 			wpad_previous_keys = 0xf;
 		}
 
@@ -781,9 +781,9 @@ void IN_Rumble (int low_frequency, int high_frequency, int duration)
 	
 	//it switches rumble on for rumble_time milliseconds  
 	if(!nunchuk_connected && !classic_connected)
-		PAD_ControlMotor(0, true);
+		PAD_ControlMotor(PAD_CHAN0, PAD_MOTOR_RUMBLE);
 	else
-		WPAD_Rumble(0, true);
+		WPAD_Rumble(WPAD_CHAN_0, 1);
 	rumble_on=1;
 	time_wpad_off = Sys_FloatTime() + rumble_time;
 }

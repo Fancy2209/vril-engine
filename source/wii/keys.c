@@ -28,7 +28,7 @@ key up events are sent even if in console mode
 
 
 #define		MAXCMDLINE	256
-char	key_lines[32][MAXCMDLINE];
+char	key_lines[64][MAXCMDLINE];
 int		key_linepos;
 int		shift_down=false;
 int		key_lastpress;
@@ -46,6 +46,8 @@ qboolean	consolekeys[256];	// if true, can't be rebound while in console
 qboolean	menubound[256];	// if true, can't be rebound while in menu
 int		keyshift[256];		// key to map to if shift held down in console
 int		key_repeats[256];	// if > 1, it is autorepeating
+qboolean keydown[256];
+
 qboolean	keydown[KEY_COUNT];
 
 extern bool nunchuk_connected;
@@ -269,8 +271,8 @@ void Key_Console (int key)
 				break;
 
 			case K_JOY17:
-				strncpy(workline,osk_buffer,MAX_CHAR_LINE);
-				//strcpy(key_lines[edit_line],workline);
+				Q_strncpy(workline,osk_buffer,MAX_CHAR_LINE);
+				//Q_strcpy(key_lines[edit_line],workline);
 				Con_SetOSKActive(false);
 				break;
 
@@ -330,7 +332,7 @@ void Key_Console (int key)
 				cmd = Cvar_CompleteVariable (key_lines[edit_line]+1);
 			if (cmd)
 			{
-				strcpy (key_lines[edit_line]+1, cmd);
+				Q_strcpy (key_lines[edit_line]+1, cmd);
 				key_linepos = Q_strlen(cmd)+1;
 				key_lines[edit_line][key_linepos] = ' ';
 				key_linepos++;
@@ -341,7 +343,7 @@ void Key_Console (int key)
 		
 		if (key == K_JOY17) {
 			Con_SetOSKActive(true);
-			//strcpy(osk_buffer, workline);
+			//Q_strcpy(osk_buffer, workline);
 			return;
 		}
 		
@@ -361,7 +363,7 @@ void Key_Console (int key)
 					&& !key_lines[history_line][1]);
 			if (history_line == edit_line)
 				history_line = (edit_line+1)&31;
-			strcpy(key_lines[edit_line], key_lines[history_line]);
+			Q_strcpy(key_lines[edit_line], key_lines[history_line]);
 			key_linepos = Q_strlen(key_lines[edit_line]);
 			return;
 		}
@@ -382,7 +384,7 @@ void Key_Console (int key)
 			}
 			else
 			{
-				strcpy(key_lines[edit_line], key_lines[history_line]);
+				Q_strcpy(key_lines[edit_line], key_lines[history_line]);
 				key_linepos = Q_strlen(key_lines[edit_line]);
 			}
 			return;
@@ -459,7 +461,7 @@ void Key_Message (key_id_t key)
 		chat_buffer[0] = 0;
 		return;
 	}
-
+	
 	if (key == K_ESCAPE)
 	{
 		console_enabled = false;
@@ -890,8 +892,7 @@ void Key_Event (key_id_t key, qboolean down)
 			return;	// ignore most autorepeats
 		}
 			
-		if (key >= 200 && !keybindings[key])
-			Con_Printf ("%s is unbound, hit START to set.\n", Key_KeynumToString (key) );
+		Con_Printf ("%s is unbound, use the options screen to set.\n", Key_KeynumToString (key) );
 	}
 
 	if (key == K_SHIFT)
@@ -900,6 +901,7 @@ void Key_Event (key_id_t key, qboolean down)
 //
 // handle escape specialy, so the user can never unbind it
 //
+	/*
 	if (key == K_ESCAPE)
 	{
 		if (!down)
@@ -923,7 +925,7 @@ void Key_Event (key_id_t key, qboolean down)
 		}
 		return;
 	}
-
+	*/
 //
 // key up events only generate commands if the game key binding is
 // a button command (leading + sign).  These will occur even in console mode,
@@ -936,7 +938,7 @@ void Key_Event (key_id_t key, qboolean down)
 		kb = keybindings[key];
 		if (kb && kb[0] == '+')
 		{
-			sprintf (cmd, "-%s %i\n", kb+1, key);
+			Q_sprintf (cmd, "-%s %i\n", kb+1, key);
 			Cbuf_AddText (cmd);
 		}
 		if (keyshift[key] != key)
@@ -944,7 +946,7 @@ void Key_Event (key_id_t key, qboolean down)
 			kb = keybindings[keyshift[key]];
 			if (kb && kb[0] == '+')
 			{
-				sprintf (cmd, "-%s %i\n", kb+1, key);
+				Q_sprintf (cmd, "-%s %i\n", kb+1, key);
 				Cbuf_AddText (cmd);
 			}
 		}
@@ -1016,20 +1018,20 @@ void Key_Event (key_id_t key, qboolean down)
 
 	switch (key_dest)
 	{
-	case key_message:
-		Key_Message (key);
-		break;
-	case key_menu:
-	case key_menu_pause:
-		M_Keydown (key);
-		break;
+		case key_message:
+			Key_Message (key);
+			break;
+		case key_menu:
+		case key_menu_pause:
+			M_Keydown (key);
+			break;
 
-	case key_game:
-	case key_console:
-		Key_Console (key);
-		break;
-	default:
-		Sys_Error ("Bad key_dest");
+		case key_game:
+		case key_console:
+			Key_Console (key);
+			break;
+		default:
+			Sys_Error ("Bad key_dest");
 	}
 }
 
