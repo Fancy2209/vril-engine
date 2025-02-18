@@ -1500,7 +1500,7 @@ int SCR_ModalMessage (char *text)
 	scr_fullupdate = 0;
 	SCR_UpdateScreen ();
 
-	return (key_lastpress == 'y') || (key_lastpress == K_JOY0) || (key_lastpress == K_JOY9) || (key_lastpress == K_JOY20);
+	return (key_lastpress == 'y') || (key_lastpress == K_JOY0) || (key_lastpress == K_JOY9);
 }
 
 

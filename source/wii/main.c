@@ -249,10 +249,8 @@ int main(int argc, char* argv[])
 		
 		if (rumble_on && (current_time > time_wpad_off)) 
 		{
-			if(!nunchuk_connected && !classic_connected)
-				PAD_ControlMotor(PAD_CHAN0, PAD_MOTOR_STOP);
-			else
-				WPAD_Rumble(WPAD_CHAN_0, 0);
+			PAD_ControlMotor(PAD_CHAN0, PAD_MOTOR_STOP);
+			WPAD_Rumble(WPAD_CHAN_0, 0);
 			rumble_on = 0;
 		}
 		
