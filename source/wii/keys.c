@@ -584,7 +584,7 @@ void Key_SetBinding (key_id_t keynum, char *binding)
 Key_SetDTBinding
 ===================
 */
-void Key_SetDTBinding (int keynum, char *binding)
+void Key_SetDTBinding (key_id_t keynum, char *binding)
 {
 	char	*new;
 	int		l;
@@ -760,7 +760,7 @@ void Key_WriteDTBindings (FILE *f)
 {
 	int		i;
 
-	for (i=0 ; i<256 ; i++)
+	for (i=0 ; i<KEY_COUNT ; i++)
 		if (dtbindings[i])
 			if (*dtbindings[i])
 				fprintf (f, "binddt \"%s\" \"%s\"\n", Key_KeynumToString(i), dtbindings[i]);
@@ -891,8 +891,9 @@ void Key_Event (key_id_t key, qboolean down)
 		{
 			return;	// ignore most autorepeats
 		}
-			
-		Con_Printf ("%s is unbound, use the options screen to set.\n", Key_KeynumToString (key) );
+		
+		if (key >= K_BACKSPACE && !keybindings[key])
+			Con_Printf ("%s is unbound, use the options screen to set.\n", Key_KeynumToString (key) );
 	}
 
 	if (key == K_SHIFT)

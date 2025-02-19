@@ -873,6 +873,10 @@ Host_Init
 extern bool new3ds_flag;
 #endif // _3DS
 
+#ifdef __WII__
+#include "wii/input_wiimote.h"
+#endif
+
 void M_Start_Menu_f (void);
 void Host_Init (quakeparms_t *parms)
 {
@@ -963,6 +967,17 @@ void Host_Init (quakeparms_t *parms)
 	}
 	Preload();
 	Cbuf_InsertText ("exec nzp.rc\n");
+	#ifdef __WII__
+	// Needed as this is where the nunchuck_connected and classic_connected vars get set
+	IN_Commands();
+	if(nunchuk_connected)
+		Cbuf_InsertText ("exec wiimote.cfg\n");
+	else if (classic_connected)
+		Cbuf_InsertText ("exec classiccontroler.cfg\n");
+	else
+		Cbuf_InsertText ("exec gamecube.cfg\n");
+	#endif
+	
 
 	Hunk_AllocName (0, "-HOST_HUNKLEVEL-");
 	host_hunklevel = Hunk_LowMark ();

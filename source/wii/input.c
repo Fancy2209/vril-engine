@@ -55,8 +55,8 @@ nunchuk_t nunchuk;
 gforce_t gforce;//Nunchuk shake
 
 bool wiimote_connected = true;
-bool nunchuk_connected = true;
-bool classic_connected = true;
+bool nunchuk_connected = false;
+bool classic_connected = false;
 bool keyboard_connected = false;
 
 typedef enum  {LEFT, CENTER_X, RIGHT} stick_x_st_t;
@@ -224,6 +224,7 @@ void IN_Commands (void)
 	if(exp_type == WPAD_EXP_NUNCHUK || exp_type == WPAD_EXP_GUITARHERO3) {
 		//Con_Printf ("Nunchuk detected..\n");
 		if(!nunchuk_connected) {
+			Cbuf_InsertText ("exec wiimote.cfg\n");
 			wpad_previous_keys = 0xf;
 		}
 
@@ -235,6 +236,7 @@ void IN_Commands (void)
 	} else if(exp_type == WPAD_EXP_CLASSIC) {
 		//Con_Printf ("Classic Controller detected..\n");
 		if(!classic_connected) {
+			Cbuf_InsertText ("exec classiccontroler.cfg\n");
 			wpad_previous_keys = 0xf;
 		}
 
@@ -246,6 +248,7 @@ void IN_Commands (void)
 	} else {
 		//Here neither the classic controller nor the nuncunk are connected
 		if(classic_connected || nunchuk_connected) {
+			Cbuf_InsertText ("exec gamecube.cfg\n");
 			wpad_previous_keys = 0xf;
 		}
 
