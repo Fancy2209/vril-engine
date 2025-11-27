@@ -522,7 +522,8 @@ void Draw_String (int x, int y, char *str)
 
 void Draw_ColoredString(int x, int y, char *str, float r, float g, float b, float a, float scale) 
 {
-#if 0
+	if (*str == NULL) return;
+
 	while (*str)
 	{
 		Draw_CharacterRGBA (x, y, *str, r, g, b, a, (int)scale);
@@ -537,7 +538,6 @@ void Draw_ColoredString(int x, int y, char *str, float r, float g, float b, floa
 		
 		str++;
 	}
-#endif
 }
 
 int getTextWidth(char *str, float scale)
