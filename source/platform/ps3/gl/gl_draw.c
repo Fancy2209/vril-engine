@@ -522,6 +522,8 @@ void Draw_String (int x, int y, char *str)
 
 void Draw_ColoredString(int x, int y, char *str, float r, float g, float b, float a, float scale) 
 {
+	if (str == NULL) return;
+
 	while (*str)
 	{
 		Draw_CharacterRGBA (x, y, *str, r, g, b, a, (int)scale);
@@ -541,6 +543,8 @@ void Draw_ColoredString(int x, int y, char *str, float r, float g, float b, floa
 int getTextWidth(char *str, float scale)
 {
 	int width = 0;
+
+	if (str == NULL) return 0;
 
     for (int i = 0; i < strlen(str); i++) {
         // Hooray for variable-spacing!
