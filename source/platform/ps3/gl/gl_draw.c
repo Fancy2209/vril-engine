@@ -522,7 +522,7 @@ void Draw_String (int x, int y, char *str)
 
 void Draw_ColoredString(int x, int y, char *str, float r, float g, float b, float a, float scale) 
 {
-	if (*str == NULL) return;
+	if (str == NULL) return;
 
 	while (*str)
 	{
