@@ -200,7 +200,10 @@ double Sys_FloatTime (void)
 	
 	u64 current_tick = __builtin_ppc_mftb();
 
-	return ((double)(current_tick - initial_tick))/1000000.0;
+	// PS3 PPU timebase frequency = 79.8 MHz
+    const double tb_freq = 79800000.0;
+
+    return (double)(current_tick - initial_tick) / tb_freq;;
 }
 
 char *Sys_ConsoleInput (void)
