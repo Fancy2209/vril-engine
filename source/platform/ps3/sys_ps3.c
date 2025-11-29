@@ -235,6 +235,7 @@ void Sys_DefaultConfig(void)
 #define PS3_SEND_KEY(QUAKEBTN, PADBTN) \
 if (currentPadData.PADBTN != previousPadData.PADBTN) \
 	Key_Event(QUAKEBTN, currentPadData.PADBTN);
+padData currentPadData;
 void Sys_SendKeyEvents (void)
 {
 	padInfo padInfo;
@@ -242,7 +243,6 @@ void Sys_SendKeyEvents (void)
 	if (!padInfo.status[0]) return;
 
 	static padData previousPadData;
-	static padData currentPadData;
 	ioPadGetData(0, &currentPadData);	
 	PS3_SEND_KEY(K_SELECT,     BTN_SELECT);
 	PS3_SEND_KEY(K_ESCAPE,     BTN_START);

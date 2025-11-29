@@ -51,7 +51,7 @@ void IN_Commands (void)
 
 float IN_CalcInput(int axis, float speed, float tolerance, float acceleration) {
 
-	float value = ((float) axis / 128.0f);
+	float value = ((float) axis / 128.0f) - 1.0f;
 
 	if (value == 0.0f) {
 		return 0.0f;
@@ -78,17 +78,11 @@ float IN_CalcInput(int axis, float speed, float tolerance, float acceleration) {
 
 extern cvar_t scr_fov;
 extern int original_fov, final_fov;
+extern padData currentPadData;
 void IN_Move (usercmd_t *cmd)
 {
 	V_StopPitchDrift();
 
-	padInfo padInfo;
-	ioPadGetInfo(&padInfo);
-	if (!padInfo.status[0]) return;
-
-	// Read the pad state.
-	padData pad;
-	ioPadGetData(0, &pad);
 
 	// Convert the inputs to floats in the range [-1, 1].
 	// Implement the dead zone.
@@ -115,11 +109,11 @@ void IN_Move (usercmd_t *cmd)
 	
 	// Are we using the left or right stick for looking?
 	if (!in_anub_mode.value) { // Left
-		look_x = IN_CalcInput(pad.ANA_L_H, speed, deadZone, acceleration);
-		look_y = IN_CalcInput(pad.ANA_L_V, speed, deadZone, acceleration) * -1;
+		look_x = IN_CalcInput(currentPadData.ANA_L_H, speed, deadZone, acceleration);
+		look_y = IN_CalcInput(currentPadData.ANA_L_V, speed, deadZone, acceleration) * -1;
 	} else { // Right
-		look_x = IN_CalcInput(pad.ANA_R_H, speed, deadZone, acceleration);
-		look_y = IN_CalcInput(pad.ANA_R_V, speed, deadZone, acceleration) * -1;
+		look_x = IN_CalcInput(currentPadData.ANA_R_H, speed, deadZone, acceleration);
+		look_y = IN_CalcInput(currentPadData.ANA_R_V, speed, deadZone, acceleration) * -1;
 	}
 
 	const float yawScale = 30.0f;
@@ -142,11 +136,11 @@ void IN_Move (usercmd_t *cmd)
 	float input_x, input_y;
 
 	if (in_anub_mode.value) {
-		input_x = pad.ANA_L_H;
-		input_y = 255 - pad.ANA_L_V;
+		input_x = currentPadData.ANA_L_H;
+		input_y = 255 - currentPadData.ANA_L_V;
 	} else {
-		input_x = pad.ANA_R_H;
-		input_y = 255 - pad.ANA_R_V;
+		input_x = currentPadData.ANA_R_H;
+		input_y = 255 - currentPadData.ANA_R_V;
 	}
 
 	cl_backspeed = cl_forwardspeed = cl_sidespeed = sv_player->v.maxspeed;
