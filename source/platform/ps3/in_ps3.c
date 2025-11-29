@@ -142,7 +142,7 @@ void IN_Move (usercmd_t *cmd)
 	float input_x, input_y;
 
 	if (in_anub_mode.value) {
-		input_x = (128 - pad.ANA_L_H);
+		input_x = pad.ANA_L_H;
 		input_y = 255 - pad.ANA_L_V;
 	} else {
 		input_x = pad.ANA_R_H;
