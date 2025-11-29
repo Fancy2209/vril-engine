@@ -200,7 +200,7 @@ double Sys_FloatTime (void)
 	
 	u64 current_tick = __builtin_ppc_mftb();
 
-	return ((double)(current_tick - initial_tick))/sysGetTimebaseFrequency();
+	return ((double)(current_tick - initial_tick))/1000000.0;
 }
 
 char *Sys_ConsoleInput (void)
