@@ -357,10 +357,9 @@ void R_DrawSequentialPoly (msurface_t *s)
 			{
 				lightmap_modified[i] = false;
 				theRect = &lightmap_rectchange[i];
-				// fancyTODO: Add glTexSubImage2D to PS3GL
-				//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, theRect->t, 
-				//	BLOCK_WIDTH, theRect->h, gl_lightmap_format, GL_UNSIGNED_BYTE,
-				//	lightmaps+(i* BLOCK_HEIGHT + theRect->t) *BLOCK_WIDTH*lightmap_bytes);
+				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, theRect->t, 
+					BLOCK_WIDTH, theRect->h, gl_lightmap_format, GL_UNSIGNED_BYTE,
+					lightmaps+(i* BLOCK_HEIGHT + theRect->t) *BLOCK_WIDTH*lightmap_bytes);
 				theRect->l = BLOCK_WIDTH;
 				theRect->t = BLOCK_HEIGHT;
 				theRect->h = 0;
@@ -460,10 +459,9 @@ void R_DrawSequentialPoly (msurface_t *s)
 		{
 			lightmap_modified[i] = false;
 			theRect = &lightmap_rectchange[i];
-			// fancyTODO: Add glTexSubImage2D to PS3GL
-			//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, theRect->t, 
-			//	BLOCK_WIDTH, theRect->h, gl_lightmap_format, GL_UNSIGNED_BYTE,
-			//	lightmaps+(i* BLOCK_HEIGHT + theRect->t) *BLOCK_WIDTH*lightmap_bytes);
+			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, theRect->t, 
+				BLOCK_WIDTH, theRect->h, gl_lightmap_format, GL_UNSIGNED_BYTE,
+				lightmaps+(i* BLOCK_HEIGHT + theRect->t) *BLOCK_WIDTH*lightmap_bytes);
 			theRect->l = BLOCK_WIDTH;
 			theRect->t = BLOCK_HEIGHT;
 			theRect->h = 0;
@@ -629,10 +627,9 @@ void R_BlendLightmaps ()
 		{
 			lightmap_modified[i] = false;
 			theRect = &lightmap_rectchange[i];
-			// fancyTODO: Add glTexSubImage2D to PS3GL
-			//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, theRect->t, 
-			//	BLOCK_WIDTH, theRect->h, gl_lightmap_format, GL_UNSIGNED_BYTE,
-			//	lightmaps+(i* BLOCK_HEIGHT + theRect->t) *BLOCK_WIDTH*lightmap_bytes);
+			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, theRect->t, 
+				BLOCK_WIDTH, theRect->h, gl_lightmap_format, GL_UNSIGNED_BYTE,
+				lightmaps+(i* BLOCK_HEIGHT + theRect->t) *BLOCK_WIDTH*lightmap_bytes);
 			theRect->l = BLOCK_WIDTH;
 			theRect->t = BLOCK_HEIGHT;
 			theRect->h = 0;
@@ -985,9 +982,6 @@ void DrawTextureChains (void)
 	glDisable(GL_ALPHA_TEST);
 }
 
-// fancyTODO: Implement these in PS3GL
-void glPushMatrix(void) {}
-void glPopMatrix(void) {}
 /*
 =================
 R_DrawBrushModel
@@ -1629,11 +1623,14 @@ void GL_BuildLightmaps (void)
 		texture_extension_number += MAX_LIGHTMAPS;
 	}
 
-	gl_lightmap_format = GL_LUMINANCE;
+	// PS3GL has no GL_LUMINANCE support
+	// so use GL_RGBA for now
+	gl_lightmap_format = GL_RGBA;
+	lightmap_bytes = 4;
 	// default differently on the Permedia
 	if (isPermedia)
 		gl_lightmap_format = GL_RGBA;
-
+#if 0
 	if (COM_CheckParm ("-lm_1"))
 		gl_lightmap_format = GL_LUMINANCE;
 	if (COM_CheckParm ("-lm_a"))
@@ -1659,6 +1656,7 @@ void GL_BuildLightmaps (void)
 		lightmap_bytes = 1;
 		break;
 	}
+#endif
 
 	for (j=1 ; j<MAX_MODELS ; j++)
 	{

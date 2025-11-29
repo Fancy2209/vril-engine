@@ -1,5 +1,5 @@
 /*
-Copyright (C) 1996-1997 Id Software, Inc.
+Copyright (C) 2007 Peter Mackay and Chris Swindle.
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -17,7 +17,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-// in_ctr.c -- for the Nintendo 3DS
+// in_ps3.c -- for the Sony PlayStation 3
 
 #include "../../nzportable_def.h"
 #include <io/pad.h>
@@ -36,9 +36,7 @@ extern cvar_t in_anub_mode;
 
 void IN_Init (void)
 {
-	//if (new3ds_flag) {
-		Cvar_SetValue("in_anub_mode", 1);
-	//}
+	Cvar_SetValue("in_anub_mode", 1);
 }
 
 void IN_Shutdown (void)
@@ -53,7 +51,7 @@ void IN_Commands (void)
 
 float IN_CalcInput(int axis, float speed, float tolerance, float acceleration) {
 
-	float value = ((float) axis / 255.0f);
+	float value = ((float) axis / 128.0f);
 
 	if (value == 0.0f) {
 		return 0.0f;
@@ -82,44 +80,15 @@ extern cvar_t scr_fov;
 extern int original_fov, final_fov;
 void IN_Move (usercmd_t *cmd)
 {
-// TODO: Could use cellSubDisplayGetTouchInfo here if we want
-// to use cellSubDisplay to use the PSVita like the 3DS Bottom Screen
-#if 0
-	// Touch based viewangles based on Quake2CTR
-	// This was originally based on ctrQuake, however
-	// that implementation was less elegant and had
-	// a weird jerk bug when tapping the screen.
-	if(hidKeysDown() & KEY_TOUCH)
-		hidTouchRead(&old_touch);
-
-	if((hidKeysHeld() & KEY_TOUCH))
-	{
-		hidTouchRead(&cur_touch);
-
-		if(cur_touch.px < 268)
-		{
-			int tx = cur_touch.px - old_touch.px;
-			int ty = cur_touch.py - old_touch.py;
-
-			if(m_pitch.value < 0)
-				ty = -ty;
-
-			cl.viewangles[YAW]   -= abs(tx) > 1 ? tx * sensitivity.value * 0.33f : 0;
-			cl.viewangles[PITCH] += abs(ty) > 1 ? ty * sensitivity.value * 0.33f : 0;
-		}
-
-		old_touch = cur_touch;
-	}
-#endif
-
-	// TODO: Detect circle pad pro?
-	padData padData;
-	
 	V_StopPitchDrift();
 
-	// Read the pad states
-	ioPadGetData(0, &padData);
-	
+	padInfo padInfo;
+	ioPadGetInfo(&padInfo);
+	if (!padInfo.status[0]) return;
+
+	// Read the pad state.
+	padData pad;
+	ioPadGetData(0, &pad);
 
 	// Convert the inputs to floats in the range [-1, 1].
 	// Implement the dead zone.
@@ -128,20 +97,16 @@ void IN_Move (usercmd_t *cmd)
 	float acceleration = in_acceleration.value;
 	float look_x, look_y;
 
-	// 
+	//
 	// Analog look tweaks
 	//
 	speed = sensitivity.value;
-
-	if (!in_anub_mode.value)
-		speed -= 2;
-	else
-		speed += 8;
 
 	// cut look speed in half when facing enemy, unless mag is empty
 	if ((in_aimassist.value) && (sv_player->v.facingenemy == 1) && cl.stats[STAT_CURRENTMAG] > 0) {
 		speed *= 0.5f;
 	}
+
 	// additionally, slice look speed when ADS/scopes
 	if (cl.stats[STAT_ZOOM] == 1)
 		speed *= 0.5f;
@@ -150,11 +115,11 @@ void IN_Move (usercmd_t *cmd)
 	
 	// Are we using the left or right stick for looking?
 	if (!in_anub_mode.value) { // Left
-		look_x = IN_CalcInput(padData.ANA_L_H, speed, deadZone, acceleration);
-		look_y = IN_CalcInput(padData.ANA_L_V, speed, deadZone, acceleration);
+		look_x = IN_CalcInput(pad.ANA_L_H, speed, deadZone, acceleration);
+		look_y = IN_CalcInput(pad.ANA_L_V, speed, deadZone, acceleration) * -1;
 	} else { // Right
-		look_x = IN_CalcInput(padData.ANA_R_H, speed, deadZone, acceleration);
-		look_y = IN_CalcInput(padData.ANA_R_V, speed, deadZone, acceleration);
+		look_x = IN_CalcInput(pad.ANA_R_H, speed, deadZone, acceleration);
+		look_y = IN_CalcInput(pad.ANA_R_V, speed, deadZone, acceleration) * -1;
 	}
 
 	const float yawScale = 30.0f;
@@ -177,11 +142,11 @@ void IN_Move (usercmd_t *cmd)
 	float input_x, input_y;
 
 	if (in_anub_mode.value) {
-		input_x = padData.ANA_L_H;
-		input_y = padData.ANA_L_V;
+		input_x = (128 - pad.ANA_L_H);
+		input_y = 255 - pad.ANA_L_V;
 	} else {
-		input_x = padData.ANA_R_H;
-		input_y = padData.ANA_R_V;
+		input_x = pad.ANA_R_H;
+		input_y = 255 - pad.ANA_R_V;
 	}
 
 	cl_backspeed = cl_forwardspeed = cl_sidespeed = sv_player->v.maxspeed;
@@ -203,7 +168,7 @@ void IN_Move (usercmd_t *cmd)
 	} 
 
 	// crosshair stuff
-	if (input_x < 50 && input_x > -50 && input_y < 50 && input_y > -50) {
+	if (cmd->forwardmove == 0.0f && cmd->sidemove == 0.0f && cl.onground) {
 		croshhairmoving = false;
 
 		crosshair_opacity += 22;

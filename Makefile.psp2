@@ -113,17 +113,19 @@ ifeq ($(FANALYZER),1)
 CFLAGS		+= -fanalyzer
 endif
 
-CXXFLAGS  = $(CFLAGS) -fno-exceptions -std=gnu++11 \
-			-Wno-write-strings -Wno-sign-compare -Wno-strict-aliasing
-ASFLAGS = $(CFLAGS)
+CXXFLAGS = $(CFLAGS) -fno-rtti -Wcast-qual -Wno-write-strings -Wno-sign-compare -Wno-strict-aliasing
+ASFLAGS = $(CFLAGS) -c
 
 all: _build_info.h $(TARGET).vpk
 
+%.o: %.c
+	$(CC) -std=gnu99 $(CFLAGS) -c $< -o $@
+
 _build_info.h:
 	rm -rf $(CURDIR)/source/_build_info.h
-	echo "#define GIT_HASH \"$(shell git rev-parse --short HEAD)$(shell git diff --quiet || echo -dirty)\"" > $(CURDIR)/source/_build_info.h
-	echo "#define GIT_BRANCH \"$(shell git rev-parse --abbrev-ref HEAD)\"" >> $(CURDIR)/source/_build_info.h
-	echo "#define BUILD_DATE \"$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")\"" >> $(CURDIR)/source/_build_info.h
+	echo "#define GIT_HASH \"$(shell git rev-parse --short HEAD)$(shell git diff --quiet || echo -dirty)\"" > source/_build_info.h
+	echo "#define GIT_BRANCH \"$(shell git rev-parse --abbrev-ref HEAD)\"" >> source/_build_info.h
+	echo "#define BUILD_DATE \"$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")\"" >> source/_build_info.h
 
 
 $(TARGET).vpk: $(TARGET).velf
@@ -152,4 +154,7 @@ $(TARGET).elf: $(OBJS)
 	$(CXX) $(GCCFLAGS) $(CXXFLAGS) $^ $(LIBS) -o $@
 
 clean:
-	@rm -rf $(TARGET).velf $(TARGET).elf $(OBJS) $(TARGET).elf.unstripped.elf $(TARGET).vpk build/eboot.bin build/sce_sys/param.sfo ./param.sfo
+	rm -rf build/
+	rm -rf source/_build_info.h
+	find . -type f -name '*.o' -exec rm {} +
+	rm -rf $(TARGET).velf $(TARGET).elf $(OBJS) $(TARGET).elf.unstripped.elf $(TARGET).vpk build/eboot.bin build/sce_sys/param.sfo ./param.sfo

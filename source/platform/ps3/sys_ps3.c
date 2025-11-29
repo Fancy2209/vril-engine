@@ -30,8 +30,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <sys/stat.h>
 #include <unistd.h>
 
-#define TICKS_PER_SEC sysGetTimebaseFrequency()
-
 #define QUAKE_HUNK_MB			24 		// cypress -- usable quake hunk size in mB
 #define QUAKE_HUNK_MB_NEW3DS	72		// ^^ ditto, but n3ds
 // TODO: Decide how big the PS3 hunk should be
@@ -202,7 +200,7 @@ double Sys_FloatTime (void)
 	
 	u64 current_tick = __builtin_ppc_mftb();
 
-	return (current_tick - initial_tick)/TICKS_PER_SEC;
+	return ((double)(current_tick - initial_tick))/sysGetTimebaseFrequency();
 }
 
 char *Sys_ConsoleInput (void)
@@ -230,60 +228,35 @@ void Sys_DefaultConfig(void)
 	//Cbuf_AddText ("lookspring \"0.000000\"\n");
 }
 
-#if 0
-void Sys_SetKeys(u32 keys, u32 state){
-	if( keys & KEY_SELECT)
-		Key_Event(K_SELECT, state);
-	if( keys & KEY_START)
-		Key_Event(K_ESCAPE, state);
-	if( keys & KEY_DUP)
-		Key_Event(K_UPARROW, state);
-	if( keys & KEY_DDOWN)
-		Key_Event(K_DOWNARROW, state);
-	if( keys & KEY_DLEFT)
-		Key_Event(K_LEFTARROW, state);
-	if( keys & KEY_DRIGHT)
-		Key_Event(K_RIGHTARROW, state);
-	if( keys & KEY_Y)
-		Key_Event(K_AUX4, state);
-	if( keys & KEY_X)
-		Key_Event(K_AUX3, state);
-	if( keys & KEY_B)
-		Key_Event(K_AUX2, state);
-	if( keys & KEY_A)
-		Key_Event(K_AUX1, state);
-	if( keys & KEY_L)
-		Key_Event(K_AUX5, state);
-	if( keys & KEY_R)
-		Key_Event(K_AUX7, state);
-	if( keys & KEY_ZL)
-		Key_Event(K_AUX6, state);
-	if( keys & KEY_ZR)
-		Key_Event(K_AUX8, state);
-}
-#endif
+#define PS3_SEND_KEY(QUAKEBTN, PADBTN) \
+if (currentPadData.PADBTN != previousPadData.PADBTN) \
+	Key_Event(QUAKEBTN, currentPadData.PADBTN);
 void Sys_SendKeyEvents (void)
 {
 	padInfo padInfo;
 	ioPadGetInfo(&padInfo);
 	if (!padInfo.status[0]) return;
 
-	padData padData;
-	ioPadGetData(0, &padData);	
-	Key_Event(K_SELECT, padData.BTN_SELECT);
-	Key_Event(K_ESCAPE, padData.BTN_START);
-	Key_Event(K_UPARROW, padData.BTN_UP);
-	Key_Event(K_DOWNARROW, padData.BTN_DOWN);
-	Key_Event(K_LEFTARROW, padData.BTN_LEFT);
-	Key_Event(K_RIGHTARROW, padData.BTN_RIGHT);
-	Key_Event(K_AUX4, padData.BTN_SQUARE);
-	Key_Event(K_AUX3, padData.BTN_TRIANGLE);
-	Key_Event(K_AUX2, padData.BTN_CROSS);
-	Key_Event(K_AUX1, padData.BTN_CIRCLE);
-	Key_Event(K_AUX5, padData.BTN_L1);
-	Key_Event(K_AUX7, padData.BTN_R1);
-	Key_Event(K_AUX6, padData.BTN_L2);
-	Key_Event(K_AUX8, padData.BTN_R2);
+	static padData previousPadData;
+	static padData currentPadData;
+	ioPadGetData(0, &currentPadData);	
+	PS3_SEND_KEY(K_SELECT,     BTN_SELECT);
+	PS3_SEND_KEY(K_ESCAPE,     BTN_START);
+	PS3_SEND_KEY(K_UPARROW,    BTN_UP);
+	PS3_SEND_KEY(K_DOWNARROW,  BTN_DOWN);
+	PS3_SEND_KEY(K_LEFTARROW,  BTN_LEFT);
+	PS3_SEND_KEY(K_RIGHTARROW, BTN_RIGHT);
+	PS3_SEND_KEY(K_AUX4,       BTN_SQUARE);
+	PS3_SEND_KEY(K_AUX3,       BTN_TRIANGLE);
+	PS3_SEND_KEY(K_AUX2,       BTN_CROSS);
+	PS3_SEND_KEY(K_AUX1,       BTN_CIRCLE);
+	PS3_SEND_KEY(K_AUX5,       BTN_L1);
+	PS3_SEND_KEY(K_AUX7,       BTN_R1);
+	PS3_SEND_KEY(K_AUX6,       BTN_L2);
+	PS3_SEND_KEY(K_AUX8,       BTN_R2);
+
+	if(previousPadData.button != currentPadData.button)
+		previousPadData = currentPadData;
 }
 
 void Sys_HighFPPrecision (void)

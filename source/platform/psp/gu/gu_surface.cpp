@@ -1255,7 +1255,7 @@ void R_DrawBrushModel (entity_t *e)
 	}
 	else if (ISGLOW(e))
 	{
-		sceGuTexFunc(GU_TFX_MODULATE , GU_TCC_RGBA);
+		sceGuTexFunc(GU_TFX_MODULATE, GU_TCC_RGBA);
 		sceGuDepthMask(GU_TRUE);
 		sceGuBlendFunc(GU_ADD, GU_SRC_ALPHA, GU_FIX, 0, 0xFFFFFFFF);
 		R_GlowSetupBegin(e);
