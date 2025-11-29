@@ -51,7 +51,7 @@ void IN_Commands (void)
 
 float IN_CalcInput(int axis, float speed, float tolerance, float acceleration) {
 
-	float value = ((float) axis / 64.0f);
+	float value = ((float) axis / 128.0f);
 
 	if (value == 0.0f) {
 		return 0.0f;
