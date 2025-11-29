@@ -191,20 +191,20 @@ void Sys_Quit (void)
 	exit(0);
 }
 
-// should be Sys_DoubleTime
-double Sys_FloatTime (void)
+double Sys_DoubleTime(void)
 {
-	static u64 initial_tick = 0;
+    static uint64_t initial_tb = 0;
+    static uint64_t tb_freq = 0;
 
-	if(!initial_tick)
-		initial_tick = __builtin_ppc_mftb();
-	
-	u64 current_tick = __builtin_ppc_mftb();
+    if (tb_freq == 0)
+        tb_freq = sysGetTimebaseFrequency();
 
-	// PS3 PPU timebase frequency = 79.8 MHz
-    const double tb_freq = 79800000.0;
+    uint64_t tb = __builtin_ppc_mftb();
 
-    return (double)(current_tick - initial_tick) / tb_freq;;
+    if (initial_tb == 0)
+        initial_tb = tb;
+
+    return (double)(tb - initial_tb) / (double)tb_freq;
 }
 
 char *Sys_ConsoleInput (void)
