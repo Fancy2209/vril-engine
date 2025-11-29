@@ -299,7 +299,7 @@ int main (int argc, char **argv)
 	//CFGU_GetSystemModel(&model);
 	//cfguExit();
 	
-	ioPadInit(1);
+	ioPadInit(0);
 	//if(model != CFG_MODEL_2DS && new3ds_flag == true)
 	//	gfxSetWide(true);
 	
