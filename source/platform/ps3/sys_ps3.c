@@ -191,7 +191,7 @@ void Sys_Quit (void)
 	exit(0);
 }
 
-double Sys_DoubleTime(void)
+double Sys_FloatTime(void)
 {
     static uint64_t initial_tb = 0;
     static uint64_t tb_freq = 0;
