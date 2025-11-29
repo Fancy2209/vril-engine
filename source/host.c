@@ -236,7 +236,7 @@ void Host_InitLocal (void)
 #endif // __PSP__
 
 	Cvar_RegisterVariable (&show_fps); // muff
-#ifndef __WII__
+#if !defined(__WII__) || !defined(__PS3__)
 	Cvar_RegisterVariable (&cl_maxfps); // dr_mabuse1981: maxfps setting
 #endif
 	Cvar_RegisterVariable (&fraglimit);
