@@ -191,6 +191,7 @@ void Sys_Quit (void)
 	exit(0);
 }
 
+// should be Sys_DoubleTime
 double Sys_FloatTime (void)
 {
 	static u64 initial_tick = 0;
@@ -280,7 +281,7 @@ void Sys_CaptureScreenshot(void)
 bool game_running;
 int main (int argc, char **argv)
 {
-	static float time, oldtime;
+	static double time, oldtime;
 	static quakeparms_t parms;
 	//new3ds_flag = false;
 
@@ -325,7 +326,17 @@ int main (int argc, char **argv)
 	while (/*aptMainLoop() && */game_running)
 	{
 		time = Sys_FloatTime();
-		Host_Frame (time - oldtime);
+
+		double dt = time - oldtime;
+
+		// clamp to avoid giant frame jumps
+		if (dt > 0.1)
+			dt = 0.1;
+
+		if (dt < 0.001)
+    		dt = 0.001;
+
+		Host_Frame (dt);
 		oldtime = time;
 	}
 
