@@ -68,7 +68,7 @@ cvar_t	teamplay = {"teamplay","0",false,true};
 cvar_t	samelevel = {"samelevel","0"};
 
 cvar_t	show_fps = {"show_fps","0", true};	// set for running times - muff
-#if !defiined(__WII__) || !defined(__PS3__)
+#if !defined(__WII__) || !defined(__PS3__)
 cvar_t	cl_maxfps = {"cl_maxfps", "30", true}; // dr_mabuse1981: maxfps setting
 #endif // __WII__ creates a timing issue within Dolphin emu - and vsync is always on anyhow
 
