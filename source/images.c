@@ -82,7 +82,7 @@ byte* LoadPCX(FILE* f, int matchwidth, int matchheight)
 
     pcx_t* pcx = &pcxbuf;
 
-#if __WII__ || __PS3__
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 	pcx->xmin = LittleShort(pcx->xmin);
     pcx->ymin = LittleShort(pcx->ymin);
     pcx->xmax = LittleShort(pcx->xmax);
