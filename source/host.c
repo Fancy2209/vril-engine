@@ -68,7 +68,7 @@ cvar_t	teamplay = {"teamplay","0",false,true};
 cvar_t	samelevel = {"samelevel","0"};
 
 cvar_t	show_fps = {"show_fps","0", true};	// set for running times - muff
-#if !defined(__WII__) || !defined(__PS3__)
+#ifndef __WII__
 cvar_t	cl_maxfps = {"cl_maxfps", "30", true}; // dr_mabuse1981: maxfps setting
 #endif // __WII__ creates a timing issue within Dolphin emu - and vsync is always on anyhow
 
@@ -236,7 +236,7 @@ void Host_InitLocal (void)
 #endif // __PSP__
 
 	Cvar_RegisterVariable (&show_fps); // muff
-#if !defined(__WII__) || !defined(__PS3__)
+#ifndef __WII__
 	Cvar_RegisterVariable (&cl_maxfps); // dr_mabuse1981: maxfps setting
 #endif
 	Cvar_RegisterVariable (&fraglimit);
@@ -501,18 +501,9 @@ This clears all the memory used by both the client and server, but does
 not reinitialize anything.
 ================
 */
-extern int perk_order[8];
-extern int current_perk_order;
-extern double Hitmark_Time, crosshair_spread_time;
-extern float cur_spread;
-extern float crosshair_offset_step;
 void Host_ClearMemory (void)
 {
 	Con_DPrintf ("Clearing memory\n");
-	
-#ifdef __WII__
-	GL_ClearTextureCache();
-#endif
 
 	Mod_ClearAll ();
 
@@ -522,21 +513,6 @@ void Host_ClearMemory (void)
 	cls.signon = 0;
 	memset (&sv, 0, sizeof(sv));
 	memset (&cl, 0, sizeof(cl));
-	perk_order[0] = 0;
-	perk_order[1] = 0;
-	perk_order[2] = 0;
-	perk_order[3] = 0;
-	perk_order[4] = 0;
-	perk_order[5] = 0;
-	perk_order[6] = 0;
-	perk_order[7] = 0;
-	cl.perks = 0;
-	current_perk_order = 0;
-	crosshair_spread_time = 0;
-	crosshair_offset_step = 0;
-	cur_spread = 0;
-	Hitmark_Time = 0;
-
 }
 
 
@@ -553,7 +529,7 @@ Returns false if the time is too short to run a frame
 qboolean Host_FilterTime (float time)
 {
 	realtime += (double)time;
-#if !defined(__WII__) || !defined(__PS3__)
+#ifndef __WII__
    if (cl_maxfps.value < 1) Cvar_SetValue("cl_maxfps", 30);
    if (!cls.timedemo && realtime - oldrealtime < 1.0/(double)cl_maxfps.value)
 		return false;		// framerate is too high
@@ -841,6 +817,10 @@ void Host_InitVCR (quakeparms_t *parms)
 
 void Preload (void)
 {
+
+	// why is this neccesary? 
+
+	/*
 	Mod_ForName ("models/player.mdl", true);
 
 	// Body
@@ -862,6 +842,7 @@ void Preload (void)
 	// Right Arm
 	Mod_ForName ("models/ai/zar(.mdl",true);
 	Mod_ForName ("models/ai/zarc(.mdl",true);
+	*/
 }
 /*
 ====================

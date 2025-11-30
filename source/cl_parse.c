@@ -683,8 +683,6 @@ CL_ParseClientdata
 Server information pertaining to this client only
 ==================
 */
-extern int perk_order[9];
-extern int current_perk_order;
 void CL_ParseClientdata (int bits)
 {
 	int		i, s;
@@ -911,6 +909,7 @@ void CL_ParseClientdata (int bits)
 	else
 		cl.stats[STAT_WEAPONSKIN] = 0;
 
+
 	// Weapon model index
 	i = MSG_ReadShort();
 	if (cl.stats[STAT_WEAPON] != i)
@@ -1007,14 +1006,6 @@ void CL_ParseClientdata (int bits)
 	i = MSG_ReadShort ();
 	if (cl.stats[STAT_CURRENTMAG2] != i)
 		cl.stats[STAT_CURRENTMAG2] = i;
-
-	i = MSG_ReadShort ();
-	if (cl.stats[STAT_VIEWMODEL_EFFECTS] != i)
-		cl.stats[STAT_VIEWMODEL_EFFECTS] = i;
-
-	i = MSG_ReadShort ();
-	if (cl.stats[STAT_VIEWMODEL2_EFFECTS] != i)
-		cl.stats[STAT_VIEWMODEL2_EFFECTS] = i;
 }
 
 /*
@@ -1066,9 +1057,7 @@ void CL_ParseStaticSound (void)
 	S_StaticSound (cl.sound_precache[sound_num], org, vol, atten);
 }
 
-extern double Hitmark_Time;
 extern int crosshair_spread;
-extern double crosshair_spread_time;
 double return_time;
 /*
 ===================
