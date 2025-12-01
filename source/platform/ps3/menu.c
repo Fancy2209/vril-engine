@@ -256,12 +256,12 @@ static void M_Start_Menu_Draw ()
 {
 	// Background
 	//menu_bk = Image_LoadImage("gfx/menu/menu_background", IMAGE_TGA, 0, true, false);
-	Draw_StretchPic(0, 0, menu_bk, 400, 240);
+	Draw_StretchPic(0, 0, menu_bk, vid.width, vid.height);
 
 	// Fill black to make everything easier to see
 	Draw_FillByColor(0, 0, vid.width, vid.height, 0, 0, 0, 102);
 
-	Draw_ColoredStringCentered(vid.height - 64, "Press A to Start", 255, 0, 0, 255, 1);
+	Draw_ColoredStringCentered(vid.height - (vid.height/8), "Press A to Start", 255, 0, 0, 255, 2);
 }
 
 void M_Start_Key (int key)
@@ -566,10 +566,10 @@ void M_Credits_Draw (void)
 {
    	// Background
 	//menu_bk = Image_LoadImage("gfx/menu/menu_background", IMAGE_TGA, 0, true, false);
-	Draw_StretchPic(0, 0, menu_bk, 400, 240);
+	Draw_StretchPic(0, 0, menu_bk, vid.width, vid.height);
 
 	// Fill black to make everything easier to see
-	Draw_FillByColor(0, 0, 400, 240, 0, 0, 0, 102);
+	Draw_FillByColor(0, 0, vid.width, vid.height, 0, 0, 0, 102);
 
 	// Header
 	Draw_ColoredString(5, 5, "CREDITS", 255, 255, 255, 255, 2);
@@ -768,10 +768,10 @@ void M_SinglePlayer_Draw (void)
 {
 	// Background
 	//menu_bk = Image_LoadImage("gfx/menu/menu_background", IMAGE_TGA, 0, true, false);
-	Draw_StretchPic(0, 0, menu_bk, 400, 240);
+	Draw_StretchPic(0, 0, menu_bk, vid.width, vid.height);
 
 	// Fill black to make everything easier to see
-	Draw_FillByColor(0, 0, 400, 240, 0, 0, 0, 102);
+	Draw_FillByColor(0, 0, vid.width, vid.height, 0, 0, 0, 102);
 
 	// Header
 	Draw_ColoredString(5, 5, "SOLO", 255, 255, 255, 255, 2);
@@ -1093,10 +1093,10 @@ void M_Menu_CustomMaps_Draw (void)
 {
 	// Background
 	//menu_bk = Image_LoadImage("gfx/menu/menu_background", IMAGE_TGA, 0, true, false);
-	Draw_StretchPic(0, 0, menu_bk, 400, 240);
+	Draw_StretchPic(0, 0, menu_bk, vid.width, vid.height);
 
 	// Fill black to make everything easier to see
-	Draw_FillByColor(0, 0, 400, 240, 0, 0, 0, 102);
+	Draw_FillByColor(0, 0, vid.width, vid.height, 0, 0, 0, 102);
 
 	// Header
 	Draw_ColoredString(5, 5, "CUSTOM MAPS", 255, 255, 255, 255, 2);

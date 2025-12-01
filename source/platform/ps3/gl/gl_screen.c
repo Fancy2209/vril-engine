@@ -1062,7 +1062,7 @@ void SCR_DrawLoadScreen (void)
 	}
 
 	if (loadingScreen) {
-		Draw_FillByColor(0, 0, 400, 240, 0, 0, 0, 255);
+		Draw_FillByColor(0, 0, vid.width, vid.height, 0, 0, 0, 255);
 		if (!loadscreeninit) {
 			lscreen = Image_LoadImage(va("gfx/lscreen/%s", loadname2), IMAGE_TGA | IMAGE_PNG | IMAGE_JPG, 0, false, false);
 
@@ -1073,10 +1073,10 @@ void SCR_DrawLoadScreen (void)
 			loadscreeninit = true;
 		}
 
-		Draw_StretchPic(scr_vrect.x, scr_vrect.y, lscreen, 400, 240);
+		Draw_StretchPic(vid.width, vid.height, lscreen, vid.width, vid.height);
 
-		Draw_FillByColor(0, 0, 480, 24, 0, 0, 0, 175);
-		Draw_FillByColor(0, 216, 480, 24, 0, 0, 0, 175);
+		Draw_FillByColor(0, 0, vid.width, vid.height - (vid.height/10), 0, 0, 0, 175);
+		Draw_FillByColor(0, 216, vid.width, vid.height - (vid.height/10), 0, 0, 0, 175);
 
 		if(loadnamespec != NULL) {
 			Draw_ColoredString(2, 4, loadnamespec, 255, 255, 0, 255, 2);
