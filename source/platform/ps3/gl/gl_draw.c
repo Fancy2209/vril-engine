@@ -22,7 +22,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // vid buffer
 
 #include "../../../nzportable_def.h"
-#include <3ds.h>
 
 #define GL_COLOR_INDEX8_EXT     0x80E5
 
@@ -226,7 +225,7 @@ void Draw_Init (void)
 
 	//if (!new3ds_flag) {
 		//Cvar_SetValue("gl_picmip", 1);
-		Cvar_Set ("gl_max_size", "256");
+		Cvar_Set ("gl_max_size", "1024");
 	//}
 
 	Cmd_AddCommand ("gl_texturemode", &Draw_TextureMode_f);
