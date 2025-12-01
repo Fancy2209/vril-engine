@@ -1090,7 +1090,7 @@ void SCR_DrawLoadScreen (void)
 	}
 
 	if (key_dest == key_game) {
-		Draw_ColoredStringCentered(225, lodinglinetext, 255, 255, 255, 255, 1);
+		Draw_ColoredStringCentered((vid.height/8), lodinglinetext, 255, 255, 255, 255, 1);
 	}
 }
 
