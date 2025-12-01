@@ -108,6 +108,7 @@ COMMON_OBJS =	system.o \
 				snd_dma.c \
 				snd_mix.c \
 				snd_mem.c \
+				images.c \
 				platform/ps3/snd_ps3.c \
 				platform/ps3/in_ps3.c \
 				platform/ps3/cd_null.c \

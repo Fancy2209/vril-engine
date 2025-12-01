@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "errno.h"
 
 // PS3 Headers
+#include <stdint.h>
 #include <sys/systime.h>
 #include <sys/process.h>
 #include <io/pad.h>
@@ -167,7 +168,7 @@ void Sys_PrintSystemInfo(void)
 
 void Sys_SystemError(char *error)
 {
-	FILE* f = f = fopen("log.txt", "a+");
+	FILE* f = f = fopen("/dev_hdd0/game/NZPORTABL/USRDIR/log.txt", "a+");
 	fwrite(error, 1, strlen(error), f);
 	fclose(f);
 	Sys_Quit();
@@ -218,16 +219,17 @@ void Sys_Sleep (void)
 
 void Sys_DefaultConfig(void)
 {
-	// naievil -- fixme I didn't do this
-	// fancyTODO: Bind PS3
-	Cbuf_AddText ("bind ABUTTON +right\n");
-	Cbuf_AddText ("bind BBUTTON +lookdown\n");
-	Cbuf_AddText ("bind XBUTTON +lookup\n");
-	Cbuf_AddText ("bind YBUTTON +left\n");
-	Cbuf_AddText ("bind LTRIGGER +jump\n");
-	Cbuf_AddText ("bind RTRIGGER +attack\n");
-	Cbuf_AddText ("bind PADUP \"impulse 10\"\n");
-	Cbuf_AddText ("bind PADDOWN \"impulse 12\"\n");
+	Cbuf_AddText("unbindall\n");
+	Cbuf_AddText("bind BBUTTON +jump\n"); // Cross
+	Cbuf_AddText("bind YBUTTON +attack\n"); // Square
+	Cbuf_AddText("bind ABUTTON \"impulse 12\"\n"); // Circle
+	Cbuf_AddText("bind XBUTTON \"impulse 10\"\n"); // Triangle
+	Cbuf_AddText("bind LTRIGGER +jump\n"); // Left Trigger
+	Cbuf_AddText("bind RTRIGGER +attack\n"); // Right Trigger
+	Cbuf_AddText("bind PADUP +forward\n"); // Up
+	Cbuf_AddText("bind PADDOWN +back\n"); // Down
+	Cbuf_AddText("bind PADLEFT +moveleft\n"); // Left
+	Cbuf_AddText("bind PADRIGHT +moveright\n"); // Right
 	//Cbuf_AddText ("lookstrafe \"1.000000\"\n");
 	//Cbuf_AddText ("lookspring \"0.000000\"\n");
 }
@@ -235,6 +237,7 @@ void Sys_DefaultConfig(void)
 #define PS3_SEND_KEY(QUAKEBTN, PADBTN) \
 if (currentPadData.PADBTN != previousPadData.PADBTN) \
 	Key_Event(QUAKEBTN, currentPadData.PADBTN);
+padData currentPadData;
 void Sys_SendKeyEvents (void)
 {
 	padInfo padInfo;
@@ -242,7 +245,6 @@ void Sys_SendKeyEvents (void)
 	if (!padInfo.status[0]) return;
 
 	static padData previousPadData;
-	static padData currentPadData;
 	ioPadGetData(0, &currentPadData);	
 	PS3_SEND_KEY(K_SELECT,     BTN_SELECT);
 	PS3_SEND_KEY(K_ESCAPE,     BTN_START);

@@ -38,7 +38,7 @@ cvar_t	lookspring = {"lookspring","0", true};
 cvar_t	lookstrafe = {"lookstrafe","0", true};
 #ifdef __PSP__
 cvar_t	in_sensitivity = {"sensitivity","3", true};
-#elif defined(__PS3__)
+#elif __PS3__
 cvar_t	sensitivity = {"sensitivity","3", true};
 #else
 cvar_t	sensitivity = {"sensitivity","8", true};
@@ -650,21 +650,7 @@ void CL_RelinkEntities (void)
 			}
 
 		}
-/*
-		if (ent->modelindex == cl_modelindex[mi_explo1] || ent->modelindex == cl_modelindex[mi_explo2])
-		{
-			// software removal of sprites
-			if (r_explosiontype.value == 2 || r_explosiontype.value == 3)
-				continue;
-
-			if (qmb_initialized && r_part_explosions.value)
-				continue;
-		}
-
-		if (!(model = cl.model_precache[ent->modelindex]))
-			Host_Error ("CL_RelinkEntities: bad modelindex");
-*/
-
+		
 // rotate binary objects locally
 
 		if (ent->model->flags & EF_ROTATE) {

@@ -161,7 +161,13 @@ extern qboolean console_enabled;
 void Key_Console (int key)
 {
 	char	*cmd;
-	
+#if 0
+	if (key == K_SELECT)
+	{
+		IN_SwitchKeyboard();
+		return;
+	}
+#endif
 	if (key == K_JOY3 || key == K_ENTER)
 	{		
 		Cbuf_AddText (key_lines[edit_line]+1);	// skip the >
