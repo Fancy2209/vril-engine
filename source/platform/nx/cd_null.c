@@ -17,25 +17,39 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-// input.h -- external (non-keyboard) input devices
+#include "../../nzportable_def.h"
 
-void IN_Init (void);
+void CDAudio_Play(byte track, qboolean looping)
+{
+}
 
-void IN_Shutdown (void);
 
-void IN_Commands (void);
-// oportunity for devices to stick commands on the script buffer
+void CDAudio_Stop(void)
+{
+}
 
-void IN_Move (usercmd_t *cmd);
-// add additional movement on top of the keyboard move cmd
 
-void IN_ClearStates (void);
-// restores all button and position states to defaults
+void CDAudio_Pause(void)
+{
+}
 
-#if (__3DS__ || __SWITCH__)
-void IN_SwitchKeyboard (void);
-#endif // __3DS__
 
-#ifdef __WII__
-void Wiimote_Rumble (int low_frequency, int high_frequency, int duration);
-#endif // __WII__
+void CDAudio_Resume(void)
+{
+}
+
+
+void CDAudio_Update(void)
+{
+}
+
+
+int CDAudio_Init(void)
+{
+	return 0;
+}
+
+
+void CDAudio_Shutdown(void)
+{
+}

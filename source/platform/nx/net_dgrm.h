@@ -17,25 +17,18 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-// input.h -- external (non-keyboard) input devices
+// net_dgrm.h
 
-void IN_Init (void);
 
-void IN_Shutdown (void);
-
-void IN_Commands (void);
-// oportunity for devices to stick commands on the script buffer
-
-void IN_Move (usercmd_t *cmd);
-// add additional movement on top of the keyboard move cmd
-
-void IN_ClearStates (void);
-// restores all button and position states to defaults
-
-#if (__3DS__ || __SWITCH__)
-void IN_SwitchKeyboard (void);
-#endif // __3DS__
-
-#ifdef __WII__
-void Wiimote_Rumble (int low_frequency, int high_frequency, int duration);
-#endif // __WII__
+int			Datagram_Init (void);
+void		Datagram_Listen (qboolean state);
+void		Datagram_SearchForHosts (qboolean xmit);
+qsocket_t	*Datagram_Connect (char *host);
+qsocket_t 	*Datagram_CheckNewConnections (void);
+int			Datagram_GetMessage (qsocket_t *sock);
+int			Datagram_SendMessage (qsocket_t *sock, sizebuf_t *data);
+int			Datagram_SendUnreliableMessage (qsocket_t *sock, sizebuf_t *data);
+qboolean	Datagram_CanSendMessage (qsocket_t *sock);
+qboolean	Datagram_CanSendUnreliableMessage (qsocket_t *sock);
+void		Datagram_Close (qsocket_t *sock);
+void		Datagram_Shutdown (void);

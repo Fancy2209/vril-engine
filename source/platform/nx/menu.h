@@ -17,25 +17,22 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-// input.h -- external (non-keyboard) input devices
 
-void IN_Init (void);
+//
+// the net drivers should just set the apropriate bits in m_activenet,
+// instead of having the menu code look through their internal tables
+//
+#define	MNET_IPX		1
+#define	MNET_TCP		2
 
-void IN_Shutdown (void);
+extern	int	m_activenet;
 
-void IN_Commands (void);
-// oportunity for devices to stick commands on the script buffer
+//
+// menus
+//
+void M_Init (void);
+void M_Keydown (int key);
+void M_Draw (void);
+void M_ToggleMenu_f (void);
 
-void IN_Move (usercmd_t *cmd);
-// add additional movement on top of the keyboard move cmd
 
-void IN_ClearStates (void);
-// restores all button and position states to defaults
-
-#if (__3DS__ || __SWITCH__)
-void IN_SwitchKeyboard (void);
-#endif // __3DS__
-
-#ifdef __WII__
-void Wiimote_Rumble (int low_frequency, int high_frequency, int duration);
-#endif // __WII__

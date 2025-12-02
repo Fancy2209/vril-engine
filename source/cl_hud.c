@@ -159,6 +159,8 @@ void HUD_DictateScaleFactor(void)
 	hud_scale_factor = 2.0f;
 #elif __3DS__
 	hud_scale_factor = 1.0f;
+#elif __SWITCH__
+	hud_scale_factor = 3.0f;
 #else
 	hud_scale_factor = 1.0f;
 #endif // __WII__, __PSP__, __vita__, __3DS__
@@ -1715,7 +1717,7 @@ void HUD_BettyPrompt (void)
 	Draw_Pic (x + getTextWidth("Double-tap  ", 1) - 4, 60, GetButtonIcon("+use"));
 	Draw_Pic (x + getTextWidth("Double-tap     then press   ", 1) - 4, 60, GetButtonIcon("+grenade"));
 
-#elif __3DS__
+#elif __3DS__ || __SWITCH__
 
 	char str[32];
 	char str2[32];

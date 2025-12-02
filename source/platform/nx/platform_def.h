@@ -1,5 +1,6 @@
 /*
 Copyright (C) 1996-1997 Id Software, Inc.
+Copyrgith (C) 2025 NZ:P Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -17,25 +18,16 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-// input.h -- external (non-keyboard) input devices
+// platform_def.h -- CTR-specific header to compliment primary definitions (../nzportable_def.h)
+//                   as a general rule, please try to keep this file as small as possible, and
+//                   provide context as to why additions are necessary.
 
-void IN_Init (void);
 
-void IN_Shutdown (void);
+// Some platforms have not fully migrated to bool from qboolean, CTR included. 
+#define qtrue   1
+#define qfalse  0
 
-void IN_Commands (void);
-// oportunity for devices to stick commands on the script buffer
-
-void IN_Move (usercmd_t *cmd);
-// add additional movement on top of the keyboard move cmd
-
-void IN_ClearStates (void);
-// restores all button and position states to defaults
-
-#if (__3DS__ || __SWITCH__)
-void IN_SwitchKeyboard (void);
-#endif // __3DS__
-
-#ifdef __WII__
-void Wiimote_Rumble (int low_frequency, int high_frequency, int duration);
-#endif // __WII__
+// Behaviors differ on OLD CTR / NEW CTR, this boolean is TRUE if we are running
+// on NEW CTR.
+#include <stdbool.h>
+extern bool new3ds_flag;

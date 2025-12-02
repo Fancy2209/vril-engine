@@ -68,7 +68,7 @@ extern void M_Menu_Main_f (void);
 #define MAXGAMEDIRLEN	1000
 char debuglogfile[MAXGAMEDIRLEN + 1];
 
-#ifndef __3DS__
+#if !(__3DS__ || __SWITCH__)
 void M_OSK_Draw (void);
 void Con_OSK_f (char *input, char *output, int outlen);
 void Con_OSK_Key(int key);
@@ -227,7 +227,7 @@ void Con_Init (void)
 {
 	char 	*t2 = "/" FILE_SPECIAL_PREFIX "condebug.log" FILE_SPECIAL_SUFFIX;
 
-	con_debuglog = COM_CheckParm("-condebug");
+	con_debuglog = true;
 
 	if (con_debuglog)
 	{
@@ -628,12 +628,12 @@ void Con_DrawConsole (int lines, qboolean drawinput, float scale)
 		Con_DrawInput ();
 #endif // __WII__
 
-#ifndef __3DS__
+#if !(__3DS__ || __SWITCH__)
 	Con_DrawOSK();	
 #endif // __PSP__, __3DS__, __WII__
 }
 
-#ifndef __3DS__
+#if !(__3DS__  || __SWITCH__)
 static qboolean	scr_osk_active = false;
 
 
