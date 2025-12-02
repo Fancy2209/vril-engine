@@ -274,8 +274,8 @@ int has_perk_deadshot;
 int has_perk_mulekick;
 void CL_ParseServerInfo (void)
 {
-	char	*str;
-	int		i;
+	char	*level, *str;
+	int		i, maxlen;
 	int		nummodels, numsounds;
 	char	model_precache[MAX_MODELS][MAX_QPATH];
 	char	sound_precache[MAX_SOUNDS][MAX_QPATH];
@@ -312,12 +312,13 @@ void CL_ParseServerInfo (void)
 	cl.gametype = MSG_ReadByte ();
 
 // parse signon message
-	str = MSG_ReadString ();
-	strncpy (cl.levelname, str, sizeof(cl.levelname)-1);
+	level = cl.levelname;
+	maxlen = sizeof(cl.levelname);
+	snprintf(level, maxlen, "%s", MSG_ReadString());
 
 // seperate the printfs so the server message can have a color
 	Con_Printf("\n\n\35\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\37\n\n");
-	Con_Printf ("%c%s\n", 2, str);
+	Con_Printf ("%c%s\n", 2, level);
 
 //
 // first we go through and touch all of the precache data that still
@@ -474,7 +475,7 @@ relinked.  Other attributes can change without relinking.
 */
 int	bitcounts[16];
 
-void CL_ParseUpdate (int bits)
+void CL_ParseUpdate (unsigned int bits)
 {
 	int			i;
 	model_t		*model;
@@ -683,10 +684,14 @@ CL_ParseClientdata
 Server information pertaining to this client only
 ==================
 */
-void CL_ParseClientdata (int bits)
+extern int perk_order[9];
+extern int current_perk_order;
+void CL_ParseClientdata (void)
 {
 	int		i, s;
+	unsigned int bits;
 
+	bits = (unsigned short)MSG_ReadShort();
 	if (bits & SU_VIEWHEIGHT)
 		cl.viewheight = MSG_ReadChar ();
 	else
@@ -1181,8 +1186,7 @@ void CL_ParseServerMessage (void)
 			break;
 
 		case svc_clientdata:
-			i = MSG_ReadShort ();
-			CL_ParseClientdata (i);
+			CL_ParseClientdata ();
 			break;
 
 		case svc_version:

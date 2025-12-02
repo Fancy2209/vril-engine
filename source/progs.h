@@ -56,9 +56,6 @@ extern	int	eval_renderamt, eval_rendermode, eval_rendercolor;
 
 extern	dprograms_t		*progs;
 extern	dfunction_t		*pr_functions;
-extern	char			*pr_strings;
-extern	ddef_t			*pr_globaldefs;
-extern	ddef_t			*pr_fielddefs;
 extern	dstatement_t	*pr_statements;
 extern	globalvars_t	*pr_global_struct;
 extern	float			*pr_globals;			// same as pr_global_struct
@@ -79,9 +76,6 @@ int PR_SetString(char *s);
 
 edict_t *ED_Alloc (void);
 void ED_Free (edict_t *ed);
-
-char	*ED_NewString (char *string);
-// returns a copy of the string allocated from the server's string heap
 
 void ED_Print (edict_t *ed);
 void ED_Write (FILE *f, edict_t *ed);
