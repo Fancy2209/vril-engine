@@ -446,3 +446,5 @@ extern float gVertexBuffer[VERTEXARRAYSIZE];
 extern float gColorBuffer[VERTEXARRAYSIZE];
 extern float gTexCoordBuffer[VERTEXARRAYSIZE];
 #endif // __3DS__
+
+size_t q_strlcpy (char *dst, const char *src, size_t size);
