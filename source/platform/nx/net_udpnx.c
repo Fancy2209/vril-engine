@@ -67,7 +67,6 @@ int UDP_Init (void)
 	if ((net_controlsocket = UDP_OpenSocket (5000)) == -1) //Passing 0 causes function to fail on 3DS
 	{
 		socketExit();
-
 		return -1;
 	}
 

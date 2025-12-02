@@ -283,7 +283,6 @@ void Draw_Character (int x, int y, int num)
 	GL_Bind (char_texture);
 
 	glEnable(GL_ALPHA_TEST);
-
 	glBegin (GL_QUADS);
 	glTexCoord2f (fcol, frow);
 	glVertex2f (x, y);
@@ -294,7 +293,6 @@ void Draw_Character (int x, int y, int num)
 	glTexCoord2f (fcol, frow + size);
 	glVertex2f (x, y+8);
 	glEnd ();
-
 	glDisable(GL_ALPHA_TEST);
 }
 
