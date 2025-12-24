@@ -259,9 +259,6 @@ void R_Init (void)
 #ifdef GLTEST
 	Test_Init ();
 #endif
-
-	playertextures = texture_extension_number;
-	texture_extension_number += 16;
 }
 
 /*
