@@ -2646,11 +2646,9 @@ void PF_FindFloat (void)
 
 void PR_CheckEmptyString (char *s)
 {
-// TODO: FIX THIS BEFORE PR
-#if 0
-	if (s[0] <= ' ')
+	//if (s[0] <= ' ')
+	if (s == NULL || s[0] == ' ' || s[0] == '\0')
 		PR_RunError ("Bad string");
-#endif
 }
 
 void PF_precache_file (void)

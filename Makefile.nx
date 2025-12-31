@@ -135,6 +135,7 @@ COMMON_OBJS =	system.o \
 				snd_dma.c \
 				snd_mix.c \
 				snd_mem.c \
+				images.c \
 				platform/nx/snd_nx.c \
 				platform/nx/in_nx.c \
 				platform/nx/cd_null.c \

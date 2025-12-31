@@ -25,14 +25,14 @@ dprograms_t		*progs;
 dfunction_t		*pr_functions;
 dstatement_t	*pr_statements;
 globalvars_t	*pr_global_struct;
-
-float			*pr_globals;	// same as pr_global_struct
+float			*pr_globals;			// same as pr_global_struct
 int				pr_edict_size;	// in bytes
 
-char 			*pr_strings;
+
+char			*pr_strings;
 int 			pr_strings_size;
-static ddef_t	*pr_fielddefs;
-static ddef_t	*pr_globaldefs;
+ddef_t			*pr_fielddefs;
+ddef_t			*pr_globaldefs;
 
 // 2001-09-14 Enhanced BuiltIn Function System (EBFS) by Maddes  start
 cvar_t	pr_builtin_find = {"pr_builtin_find", "0", false, false};
@@ -41,19 +41,10 @@ cvar_t	pr_builtin_remap = {"pr_builtin_remap", "0", false, false};
 
 unsigned short		pr_crc;
 
-int		type_size[8] = {
-	1,					// ev_void
-	1,	// sizeof(string_t) / 4		// ev_string
-	1,					// ev_float
-	3,					// ev_vector
-	1,					// ev_entity
-	1,					// ev_field
-	1,	// sizeof(func_t) / 4		// ev_function
-	1	// sizeof(void *) / 4		// ev_pointer
-};
+int		type_size[8] = {1,sizeof(string_t)/4,1,3,1,1,sizeof(func_t)/4,sizeof(void *)/4};
 
 ddef_t *ED_FieldAtOfs (int ofs);
-static qboolean	ED_ParseEpair (void *base, ddef_t *key, char *s);
+qboolean	ED_ParseEpair (void *base, ddef_t *key, char *s);
 
 cvar_t	nomonsters = {"nomonsters", "0"};
 cvar_t	gamecfg = {"gamecfg", "0"};
@@ -141,7 +132,7 @@ edict_t *ED_Alloc (void)
 		e = EDICT_NUM(i);
 		// the first couple seconds of server time can involve a lot of
 		// freeing and allocating, so relax the replacement policy
-		if (e->free && ( e->freetime < 2 || sv.time - (double)e->freetime > (double)0.5f ) )
+		if (e->free && ( e->freetime < 2 || (float)sv.time - e->freetime > 0.5f ) )
 		{
 			ED_ClearEdict (e);
 			return e;
@@ -743,7 +734,7 @@ void ED_ParseGlobals (char *data)
 ED_NewString
 =============
 */
-static char *ED_NewString(const char *string) 
+char *ED_NewString(char *string) 
 {
 	char *new, *new_p;
 	int i, l;
@@ -775,7 +766,7 @@ Can parse either fields or globals
 returns false if error
 =============
 */
-static qboolean	ED_ParseEpair (void *base, ddef_t *key, char *s)
+qboolean	ED_ParseEpair (void *base, ddef_t *key, char *s)
 {
 	int		i;
 	char	string[128];
