@@ -586,7 +586,7 @@ void QMB_InitParticles (void)
 
 __inline static void AddParticle (part_type_t type, vec3_t org, int count, float size, float time, col_t col, vec3_t dir)
 {
-	byte			*color;
+	byte			*color = col ? col : ColorForParticle (type);
 	int				i, j;
 	float			tempSize; //stage;
 	particle_t		*p;
@@ -605,8 +605,6 @@ __inline static void AddParticle (part_type_t type, vec3_t org, int count, float
 
 	for (i=0 ; i < count && free_particles ; i++)
 	{
-
-		color = col ? col : ColorForParticle (type);
 
 		INIT_NEW_PARTICLE(pt, p, color, size, time);
 
@@ -825,7 +823,7 @@ __inline static void AddParticle (part_type_t type, vec3_t org, int count, float
 
 __inline static void AddParticleTrail (part_type_t type, vec3_t start, vec3_t end, float size, float time, col_t col)
 {
-	byte		*color;
+	byte		*color = col ? col : ColorForParticle (type);
 	int		i, j, num_particles;
 	float		count, length;
 	vec3_t		point, delta;
@@ -889,7 +887,6 @@ __inline static void AddParticleTrail (part_type_t type, vec3_t start, vec3_t en
 
 	for (i=0 ; i < num_particles && free_particles ; i++)
 	{
-		color = col ? col : ColorForParticle (type);
 		INIT_NEW_PARTICLE(pt, p, color, size, time);
 
 		switch (type)
