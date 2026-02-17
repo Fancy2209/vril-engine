@@ -19,8 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 #include "../../nzportable_def.h"
 #include <sys/dirent.h>
-#include <3ds.h>
-#include "circle_pad_pro.h"
+//#include <3ds.h>
+//#include "circle_pad_pro.h"
 extern cvar_t	r_wateralpha;
 extern cvar_t	r_vsync;
 extern cvar_t	in_disable_analog;

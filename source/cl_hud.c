@@ -47,7 +47,7 @@ image_t 		b_circle;
 image_t 		b_square;
 image_t 		b_cross;
 image_t 		b_triangle;
-#elif __3DS__
+#elif defined(__3DS__) || defined(__SWITCH__)
 image_t 	b_abutton;
 image_t 	b_bbutton;
 image_t 	b_xbutton;
@@ -62,7 +62,7 @@ qpic_t 		*b_plus;
 qpic_t 		*b_one;
 qpic_t 		*b_two;
 qpic_t 		*b_home;
-#endif // __PSP__, __vita__, __3DS__, __WII__
+#endif // __PSP__, __vita__, __3DS__, __SWITCH__, __WII__
 
 image_t 	b_left;
 image_t 	b_right;
@@ -73,10 +73,10 @@ image_t 	b_rt;
 
 #ifdef __PSP__
 image_t 	b_home;
-#elif __3DS__
+#elif defined(__3DS__) || defined(__SWITCH__)
 image_t 	b_zlt;
 image_t 	b_zrt;
-#endif // __PSP__, __3DS__
+#endif // __PSP__, __3DS__, __SWITCH__
 
 image_t 	b_start;
 image_t 	b_select;
@@ -159,9 +159,11 @@ void HUD_DictateScaleFactor(void)
 	hud_scale_factor = 2.0f;
 #elif __3DS__
 	hud_scale_factor = 1.0f;
+#elif __SWITCH__
+	hud_scale_factor = 4.5f;
 #else
 	hud_scale_factor = 1.0f;
-#endif // __WII__, __PSP__, __vita__, __3DS__
+#endif // __WII__, __PSP__, __vita__, __3DS__, __SWITCH__
 }
 
 /*
@@ -228,7 +230,7 @@ void HUD_Init (void)
 	b_rt = Image_LoadImage ("gfx/butticons/backr1", IMAGE_TGA, 0, true, false);
 	b_start = Image_LoadImage ("gfx/butticons/funcstart", IMAGE_TGA, 0, true, false);
 	b_select = Image_LoadImage ("gfx/butticons/funcselect", IMAGE_TGA, 0, true, false);
-#elif __3DS__
+#elif defined(__3DS__) || defined (__SWITCH__)
 	b_abutton = Image_LoadImage ("gfx/butticons/facebt_a", IMAGE_TGA, 0, true, false);
 	b_bbutton = Image_LoadImage ("gfx/butticons/facebt_b", IMAGE_TGA, 0, true, false);
 	b_ybutton = Image_LoadImage ("gfx/butticons/facebt_y", IMAGE_TGA, 0, true, false);
@@ -257,7 +259,7 @@ void HUD_Init (void)
 	b_home = Image_LoadImage ("gfx/butticons/homebutton", IMAGE_TGA, 0, true, false);
 	b_one = Image_LoadImage ("gfx/butticons/1button", IMAGE_TGA, 0, true, false);
 	b_two = Image_LoadImage ("gfx/butticons/2button", IMAGE_TGA, 0, true, false);
-#endif // __PSP__, __3DS__, __WII__
+#endif // __PSP__, __3DS__, __SWITCH__, __WII__
 
     fx_blood_lu = Image_LoadImage ("gfx/hud/blood", IMAGE_TGA, 0, true, false);
 
@@ -1715,7 +1717,7 @@ void HUD_BettyPrompt (void)
 	Draw_Pic (x + getTextWidth("Double-tap  ", 1) - 4, 60, GetButtonIcon("+use"));
 	Draw_Pic (x + getTextWidth("Double-tap     then press   ", 1) - 4, 60, GetButtonIcon("+grenade"));
 
-#elif __3DS__
+#elif defined(__3DS__) || defined(__SWITCH__)
 
 	char str[32];
 	char str2[32];
@@ -1743,7 +1745,7 @@ void HUD_BettyPrompt (void)
 	Draw_ColoredStringCentered((90 * hud_scale_factor), str2, 255, 255, 255, 255, hud_scale_factor);
 	Draw_Pic (200 * hud_scale_factor + 14, 68 * hud_scale_factor, b_minus);
 
-#endif // __PSP__, __3DS__, __WII__
+#endif // __PSP__, __3DS__, __SWITCH__, __WII__
 }
 
 /*

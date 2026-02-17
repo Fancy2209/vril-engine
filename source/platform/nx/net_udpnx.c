@@ -28,13 +28,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <malloc.h>
 #include <arpa/inet.h>
 
-#include <3ds.h>
+#include <switch.h>
 #include <sys/fcntl.h>
-
-#define SOC_BUFFERSIZE  0x100000
-#define SOC_ALIGN       0x1000
-
-static u32 *SOC_buffer = NULL;
 
 extern int close (int);
 
@@ -55,37 +50,24 @@ int UDP_Init (void)
 {
 	struct qsockaddr addr;
 	char *colon;
-  	int ret;
 
 	if (COM_CheckParm ("-noudp"))
 		return -1;
 
-	SOC_buffer = (u32*)memalign(SOC_ALIGN, SOC_BUFFERSIZE);
+	socketInitializeDefault();
 	
-	if(SOC_buffer == NULL)
-	{
-		Sys_Error("Failed to allocate SOC_Buffer\n");
-	}
-	ret = socInit(SOC_buffer, SOC_BUFFERSIZE);
-	
-	if(ret != 0)
-	{
-		
-		free(SOC_buffer);
-		return -1;
-	}
-	myAddr = gethostid();
+	myAddr = htonl(INADDR_LOOPBACK);
 
 	// if the quake hostname isn't set, set it to the machine name
 	if (strcmp(hostname.string, "UNNAMED") == 0)
 	{
-		Cvar_Set ("hostname", "3ds");
+		Cvar_Set ("hostname", "switch");
 	}
 
 	if ((net_controlsocket = UDP_OpenSocket (5000)) == -1) //Passing 0 causes function to fail on 3DS
 	{
-		socExit();
-		free(SOC_buffer);
+		socketExit();
+
 		return -1;
 	}
 
@@ -111,7 +93,7 @@ void UDP_Shutdown (void)
 {
 	UDP_Listen (false);
 	UDP_CloseSocket (net_controlsocket);
-	socExit();
+	socketExit();
 }
 
 //=============================================================================

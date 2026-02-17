@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // vid buffer
 
 #include "../../../nzportable_def.h"
-#include <3ds.h>
+//#include <3ds.h>
 
 #define GL_COLOR_INDEX8_EXT     0x80E5
 #define MAX_VRAM_TEX	256*256*4

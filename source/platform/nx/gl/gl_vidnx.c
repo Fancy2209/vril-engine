@@ -17,8 +17,10 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-#include <3ds.h>
-#include <GL/picaGL.h>
+#include <switch.h>
+#include <EGL/egl.h>    // EGL library
+#include <EGL/eglext.h> // EGL extensions
+//#include <glad/glad.h>  // glad library (OpenGL loader)
 #include "../../../nzportable_def.h"
 
 unsigned	d_8to24table[256];
@@ -40,11 +42,88 @@ qboolean gl_mtexable = false;
 GL_Init
 ===============
 */
+static EGLDisplay s_display;
+static EGLContext s_context;
+static EGLSurface s_surface;
+
 void GL_Init (void)
 {
-	pglInitEx(0x040000, 0x100000);
+ // Connect to the EGL default display
+    s_display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    if (!s_display)
+    {
+        printf("Could not connect to display! error: %d", eglGetError());
+    	//return false;
+    }
 
-	glClearDepth (1.0f);
+    // Initialize the EGL display connection
+    eglInitialize(s_display, NULL, NULL);
+
+    // Select OpenGL (Core) as the desired graphics API
+    if (eglBindAPI(EGL_OPENGL_API) == EGL_FALSE)
+    {
+        printf("Could not set API! error: %d", eglGetError());
+         eglTerminate(s_display);
+   		s_display = NULL;
+    }
+
+    // Get an appropriate EGL framebuffer configuration
+    EGLConfig config;
+    EGLint numConfigs;
+    static const EGLint framebufferAttributeList[] =
+    {
+        EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
+        EGL_RED_SIZE,     8,
+        EGL_GREEN_SIZE,   8,
+        EGL_BLUE_SIZE,    8,
+        EGL_ALPHA_SIZE,   8,
+        EGL_DEPTH_SIZE,   24,
+        EGL_STENCIL_SIZE, 8,
+        EGL_NONE
+    };
+    eglChooseConfig(s_display, framebufferAttributeList, &config, 1, &numConfigs);
+    if (numConfigs == 0)
+    {
+        printf("No config found! error: %d", eglGetError());
+        eglTerminate(s_display);
+   		s_display = NULL;
+    }
+
+    // Create an EGL window surface
+    s_surface = eglCreateWindowSurface(s_display, config, nwindowGetDefault(), NULL);
+    if (!s_surface)
+    {
+        printf("Surface creation failed! error: %d", eglGetError());
+        eglTerminate(s_display);
+    	s_display = NULL;
+    }
+
+    // Create an EGL rendering context
+    static const EGLint contextAttributeList[] =
+    {
+        EGL_CONTEXT_OPENGL_PROFILE_MASK_KHR, EGL_CONTEXT_OPENGL_COMPATIBILITY_PROFILE_BIT_KHR,
+        EGL_CONTEXT_MAJOR_VERSION_KHR, 2,
+        EGL_CONTEXT_MINOR_VERSION_KHR, 1,
+        EGL_NONE
+    };
+    s_context = eglCreateContext(s_display, config, EGL_NO_CONTEXT, contextAttributeList);
+    if (!s_context)
+    {
+        fprintf(stderr, "Context creation failed! error: %d", eglGetError());
+        eglDestroySurface(s_display, s_surface);
+   		s_surface = NULL;
+    }
+
+    // Connect the context to the surface
+    eglMakeCurrent(s_display, s_surface, s_surface, s_context);
+
+	eglSwapInterval(s_display, 1);
+
+    int version = gladLoadGL(eglGetProcAddress);
+    if (version == 0) {
+        Sys_Error("Failed to initialize OpenGL context\n");
+        return;
+    }
 	glClearColor ((float)(16/255),(float)(32/255),(float)(64/255),1);
 	glCullFace(GL_FRONT);
 	glEnable(GL_TEXTURE_2D);
@@ -71,15 +150,15 @@ void GL_Init (void)
 void GL_BeginRendering (int *x, int *y, int *width, int *height)
 {
 	*x = *y = 0;
-	*width = 400;
-	*height = 240;
+	*width = 1280;
+	*height = 720;
 }
 
 
 void GL_EndRendering (void)
 {
 	//glFinish();
-	pglSwapBuffersEx(1,0); 
+	eglSwapBuffers(s_display, s_surface);
 }
 
 void	VID_SetPalette (unsigned char *palette)
@@ -170,8 +249,8 @@ void	VID_Init (unsigned char *palette)
 {
 	int i;
 	//char	gldir[512];
-	int width = 400;
-	int height = 240;
+	int width = 1920;
+	int height = 1080;
 
 	Cvar_RegisterVariable (&gl_ztrick);
 	
@@ -200,11 +279,10 @@ void	VID_Init (unsigned char *palette)
 	if (vid.conwidth > width)
 		vid.conwidth = width;
 
-	vid.width = 400;
-	vid.height = 240;
+	vid.width = 1280;
+	vid.height = 720;
 
-	vid.aspect = ((float)vid.height / (float)vid.width) *
-				(320.0f / 240.0f);
+	vid.aspect = ((float)vid.height / (float)vid.width);
 	vid.numpages = 2;
 
 	GL_Init();

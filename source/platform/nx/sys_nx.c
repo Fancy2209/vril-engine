@@ -21,32 +21,24 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../../nzportable_def.h"
 #include "errno.h"
 //#include "touch_ctr.h"
-#include "circle_pad_pro.h"
+//#include "circle_pad_pro.h"
 
-#include <3ds.h>
+#include <switch.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
-#define TICKS_PER_SEC 268123480.0
+//#define TICKS_PER_SEC 268123480.0
 
 // this is more than enough for the hunk
 #define QUAKE_HUNK_MB			20	 	// cypress -- usable quake hunk size in mB
 #define QUAKE_HUNK_MB_NEW3DS	64		// ^^ ditto, but n3ds
 
-// we don't need a very big stack. this seems to work fine
-u32 __stacksize__ = 256*1024;
-
-// linear heap is where PicaGL stores 
-// textures, unless able to store in VRAM
-u32 __ctru_linear_heap_size = 20 * 1024 * 1024;
-
 bool new3ds_flag;
-bool circlepadpro_flag;
-
-//extern void Touch_Init();
-//extern void Touch_Update();
 
 qboolean isDedicated;
+
+PadState pad;
+
 
 /*
 ===============================================================================
@@ -168,29 +160,27 @@ void Sys_MakeCodeWriteable (unsigned long startaddr, unsigned long length)
 
 void Sys_PrintSystemInfo(void)
 {
-	Con_Printf ("3DS NZP v%4.1f (3DSX: "__TIME__" "__DATE__")\n", (double)(VERSION));
-
-	if (new3ds_flag)
-		Con_Printf ("3DS Model: NEW Nintendo 3DS\n");
-	else
-		Con_Printf ("3DS Model: Nintendo 3DS\n");
+	Con_Printf ("NX NZP v%4.1f (NRO: "__TIME__" "__DATE__")\n", (double)(VERSION));
 }
 
 void Sys_SystemError(char *error)
 {
-	consoleInit(GFX_TOP, NULL);
+	consoleInit(NULL);
 
 	printf("%s=== Vril Engine Exception ===\n", CONSOLE_RED);
 	printf("%s%s\n\n", CONSOLE_WHITE, error);
 	
 	printf("%sPress START to quit.\n", CONSOLE_CYAN);
 
-	while(!(hidKeysDown() & KEY_START))
-		hidScanInput();
+	while(!(padGetButtonsDown(&pad) & HidNpadButton_Plus))
+	{
+		padUpdate(&pad);
+		consoleUpdate(NULL);
+	}
 
 	Host_Shutdown();
 
-	gfxExit();
+	consoleExit(NULL);
 	Sys_Quit();
 }
 
@@ -207,7 +197,7 @@ void Sys_Quit (void)
 {
 	Host_Shutdown();
 
-	gfxExit();
+	//gfxExit();
 	exit(0);
 }
 
@@ -216,11 +206,11 @@ double Sys_FloatTime (void)
 	static u64 initial_tick = 0;
 
 	if(!initial_tick)
-		initial_tick = svcGetSystemTick();
+		initial_tick = armGetSystemTick();
 	
-	u64 current_tick = svcGetSystemTick();
+	u64 current_tick = armGetSystemTick();
 
-	return (current_tick - initial_tick)/TICKS_PER_SEC;
+	return (double)(current_tick - initial_tick)/armGetSystemTickFreq();
 }
 
 char *Sys_ConsoleInput (void)
@@ -248,51 +238,47 @@ void Sys_DefaultConfig(void)
 }
 
 void Sys_SetKeys(u32 keys, u32 state){
-	if( keys & KEY_SELECT)
+	if( keys & HidNpadButton_Minus)
 		Key_Event(K_SELECT, state);
-	if( keys & KEY_START)
+	if( keys & HidNpadButton_Plus)
 		Key_Event(K_START, state);
-	if( keys & KEY_DUP)
+	if( keys & HidNpadButton_Up)
 		Key_Event(K_UPARROW, state);
-	if( keys & KEY_DDOWN)
+	if( keys & HidNpadButton_Down)
 		Key_Event(K_DOWNARROW, state);
-	if( keys & KEY_DLEFT)
+	if( keys & HidNpadButton_Left)
 		Key_Event(K_LEFTARROW, state);
-	if( keys & KEY_DRIGHT)
+	if( keys & HidNpadButton_Right)
 		Key_Event(K_RIGHTARROW, state);
-	if( keys & KEY_Y)
+	if( keys & HidNpadButton_Y)
 		Key_Event(K_LEFTFACE, state);
-	if( keys & KEY_X)
+	if( keys & HidNpadButton_X)
 		Key_Event(K_TOPFACE, state);
-	if( keys & KEY_B)
+	if( keys & HidNpadButton_B)
 		Key_Event(K_BOTTOMFACE, state);
-	if( keys & KEY_A)
+	if( keys & HidNpadButton_A)
 		Key_Event(K_RIGHTFACE, state);
-	if( keys & KEY_L)
+	if( keys & HidNpadButton_L)
 		Key_Event(K_LTRIGGER, state);
-	if( keys & KEY_R)
+	if( keys & HidNpadButton_R)
 		Key_Event(K_RTRIGGER, state);
-	if( keys & KEY_ZL)
+	if( keys & HidNpadButton_ZL)
 		Key_Event(K_ZLTRIGGER, state);
-	if( keys & KEY_ZR)
+	if( keys & HidNpadButton_ZR)
 		Key_Event(K_ZRTRIGGER, state);
 }
 
 void Sys_SendKeyEvents (void)
 {
-	hidScanInput();
-	
-	u32 kDown = hidKeysDown();
-	u32 kUp = hidKeysUp();
-	if(circlepadpro_flag){
-		kDown |= cppKeysDown();
-		kUp |= cppKeysUp();
-	}
+	padUpdate(&pad);
+
+	u32 kDown = padGetButtonsDown(&pad);
+	u32 kUp = padGetButtonsUp(&pad);
+
 	if(kDown)
 		Sys_SetKeys(kDown, true);
 	if(kUp)
 		Sys_SetKeys(kUp, false);
-	Touch_Update();
 }
 
 void Sys_HighFPPrecision (void)
@@ -315,26 +301,12 @@ int main (int argc, char **argv)
 {
 	static float time, oldtime;
 	static quakeparms_t parms;
-	new3ds_flag = false;
+	new3ds_flag = true;
 
-	osSetSpeedupEnable(true);
-
-	APT_CheckNew3DS(&new3ds_flag);
-
-	gfxInit(GSP_BGR8_OES, GSP_RGB565_OES, false); 
-	gfxSetDoubleBuffering(GFX_BOTTOM, false);
-	gfxSwapBuffersGpu();
-
-	uint8_t model;
-
-	cfguInit();
-	CFGU_GetSystemModel(&model);
-	cfguExit();
+	padConfigureInput(1, HidNpadStyleSet_NpadStandard);
+	padInitializeDefault(&pad);
 	
-	if(model != CFG_MODEL_2DS && new3ds_flag == true)
-		gfxSetWide(true);
-	
-	chdir("sdmc:/3ds/nzportable");
+	chdir("/switch/nzportable");
 
 	if (new3ds_flag == true)
 		parms.memsize = QUAKE_HUNK_MB_NEW3DS * 1024 * 1024;
@@ -342,34 +314,23 @@ int main (int argc, char **argv)
 		parms.memsize = QUAKE_HUNK_MB * 1024 * 1024;
 	
 	parms.membase = malloc(parms.memsize);
-	parms.basedir = ".";
+	parms.basedir = "/switch/nzportable/";
 
 	COM_InitArgv (argc, argv);
 
 	parms.argc = com_argc;
 	parms.argv = com_argv;
 
-	if(!new3ds_flag){
-		Result res = cppInit();
-		if (R_FAILED(res)) {
-			cppExit();
-		}
-	}
 	Host_Init (&parms);
-	//Touch_Init();
-	//Touch_DrawOverlay();
 
 	oldtime = Sys_FloatTime();
 
 	game_running = true;
-	while (aptMainLoop() && game_running)
+	while (appletMainLoop() && game_running)
 	{
 		time = Sys_FloatTime();
 		Host_Frame (time - oldtime);
 		oldtime = time;
 	}
-
-	if (circlepadpro_flag) cppExit();
-	
 	return 0;
 }

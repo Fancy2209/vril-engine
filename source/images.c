@@ -255,6 +255,8 @@ image_t Image_LoadImage(char* filename, int image_format, int filter, bool keep,
 	texture_index = GL_LoadTexture (texname, image_width, image_height, data, mipmap, true, 4, keep);
 #elif __3DS__
 	texture_index = GL_LoadTexture (texname, image_width, image_height, data, mipmap, true, 4, keep);
+#elif __SWITCH__
+	texture_index = GL_LoadTexture (texname, image_width, image_height, data, mipmap, true, 4, keep);
 #elif __WII__
 	texture_index = GL_LoadTexture (texname, image_width, image_height, data, false, true, keep, 4);
 #elif __NSPIRE__

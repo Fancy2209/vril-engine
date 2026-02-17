@@ -20,10 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // in_ctr.c -- for the Nintendo 3DS
 
 #include "../../nzportable_def.h"
-#include <GL/picaGL.h>
-#include <3ds.h>
-
-#include "circle_pad_pro.h"
+#include <switch.h>
+#include <limits.h>
 
 extern int bind_grab;
 
@@ -37,16 +35,6 @@ void IN_Init (void)
 {
 	if (new3ds_flag) {
 		Cvar_SetValue("in_anub_mode", 1);
-	}
-	else{
-		if(cppGetConnected()){
-			circlepadpro_flag = true;
-			Cvar_SetValue ("in_anub_mode", 1);
-		}
-		else{
-			circlepadpro_flag = false;
-			cppExit();
-		}
 	}
 }
 
@@ -62,7 +50,7 @@ void IN_Commands (void)
 
 float IN_CalcInput(int axis, float speed, float tolerance, float acceleration) {
 
-	float value = ((float) axis / 154.0f);
+	float value = ((float) axis / (SHRT_MAX/2));
 
 	if (value == 0.0f) {
 		return 0.0f;
@@ -89,48 +77,14 @@ float IN_CalcInput(int axis, float speed, float tolerance, float acceleration) {
 
 extern cvar_t scr_fov;
 extern int original_fov, final_fov;
-touchPosition old_touch, cur_touch;
+extern PadState pad;
 void IN_Move (usercmd_t *cmd)
 {
-	// Touch based viewangles based on Quake2CTR
-	// This was originally based on ctrQuake, however
-	// that implementation was less elegant and had
-	// a weird jerk bug when tapping the screen.
-	if(hidKeysDown() & KEY_TOUCH)
-		hidTouchRead(&old_touch);
-
-	if((hidKeysHeld() & KEY_TOUCH))
-	{
-		hidTouchRead(&cur_touch);
-
-		if(cur_touch.px < 268)
-		{
-			int tx = cur_touch.px - old_touch.px;
-			int ty = cur_touch.py - old_touch.py;
-
-			if(m_pitch.value < 0)
-				ty = -ty;
-
-			cl.viewangles[YAW]   -= abs(tx) > 1 ? tx * sensitivity.value * 0.33f : 0;
-			cl.viewangles[PITCH] += abs(ty) > 1 ? ty * sensitivity.value * 0.33f : 0;
-		}
-
-		old_touch = cur_touch;
-	}
-
-	circlePosition left;
-	circlePosition right;
-
 	V_StopPitchDrift();
 
 	// Read the pad states
-	hidCircleRead(&left);
-	if(circlepadpro_flag){
-		cppCircleRead(&right);
-	}
-	else{
-		hidCstickRead(&right);
-	}
+	HidAnalogStickState left = padGetStickPos(&pad, 0);
+	HidAnalogStickState right = padGetStickPos(&pad, 1);
 
 	// Convert the inputs to floats in the range [-1, 1].
 	// Implement the dead zone.
@@ -161,11 +115,11 @@ void IN_Move (usercmd_t *cmd)
 	
 	// Are we using the left or right stick for looking?
 	if (!in_anub_mode.value) { // Left
-		look_x = IN_CalcInput(left.dx, speed, deadZone, acceleration);
-		look_y = IN_CalcInput(left.dy, speed, deadZone, acceleration);
+		look_x = IN_CalcInput(left.x, speed, deadZone, acceleration);
+		look_y = IN_CalcInput(left.y, speed, deadZone, acceleration);
 	} else { // Right
-		look_x = IN_CalcInput(right.dx, speed, deadZone, acceleration);
-		look_y = IN_CalcInput(right.dy, speed, deadZone, acceleration);
+		look_x = IN_CalcInput(right.x, speed, deadZone, acceleration);
+		look_y = IN_CalcInput(right.y, speed, deadZone, acceleration);
 	}
 
 	const float yawScale = 30.0f;
@@ -188,11 +142,11 @@ void IN_Move (usercmd_t *cmd)
 	float input_x, input_y;
 
 	if (in_anub_mode.value) {
-		input_x = left.dx;
-		input_y = left.dy;
+		input_x = left.x;
+		input_y = left.y;
 	} else {
-		input_x = right.dx;
-		input_y = right.dy;
+		input_x = right.x;
+		input_y = right.y;
 	}
 
 	cl_backspeed = cl_forwardspeed = cl_sidespeed = sv_player->v.maxspeed;
@@ -234,14 +188,16 @@ void IN_Move (usercmd_t *cmd)
 //
 void IN_SwitchKeyboard(void)
 {
-	static SwkbdState swkbd;
+	static SwkbdConfig swkbd;
 	static char console_buffer[64];
 
-	swkbdInit(&swkbd, SWKBD_TYPE_QWERTY, 2, -1);
-	swkbdSetInitialText(&swkbd, console_buffer);
-	swkbdSetHintText(&swkbd, "Enter Quake console command");
-	swkbdSetButton(&swkbd, SWKBD_BUTTON_RIGHT, "Send", true);
-	swkbdInputText(&swkbd, console_buffer, sizeof(console_buffer));
-
-	Cbuf_AddText(va("%s\n", console_buffer));
+	swkbdCreate(&swkbd, 0);
+	swkbdConfigMakePresetDefault(&swkbd);
+	swkbdConfigSetInitialText(&swkbd, console_buffer);
+	swkbdConfigSetGuideText(&swkbd, "Enter Quake console command");
+	swkbdConfigSetOkButtonText(&swkbd, "Send");
+	Result rc = swkbdShow(&swkbd, console_buffer, sizeof(console_buffer));
+    if (R_SUCCEEDED(rc))
+		Cbuf_AddText(va("%s\n", console_buffer));
+	swkbdClose(&swkbd);
 }
