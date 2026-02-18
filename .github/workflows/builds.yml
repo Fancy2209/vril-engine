@@ -104,7 +104,7 @@ jobs:
           name: psp2-nzp-vpk
           path: ./nzportable.vpk
   Compile-NRO:
-    if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'pull_request' }}
+    #if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     container:
       image: devkitpro/devkita64
