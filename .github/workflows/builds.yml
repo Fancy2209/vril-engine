@@ -113,6 +113,7 @@ jobs:
       - name: Build
         working-directory: ./
         run: |
+          git config --global --add safe.directory /__w/vril-engine/vril-engine
           make -f Makefile.nx WERROR=1
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
