@@ -82,7 +82,7 @@ void PF_error (void)
 
 	s = PF_VarString(0);
 	Con_Printf ("======SERVER ERROR in %s:\n%s\n"
-	,PR_GetString(pr_xfunction->s_name,s));
+	,PR_GetString(pr_xfunction->s_name),s);
 	ed = PROG_TO_EDICT(pr_global_struct->self);
 	ED_Print (ed);
 
@@ -106,7 +106,7 @@ void PF_objerror (void)
 
 	s = PF_VarString(0);
 	Con_Printf ("======OBJECT ERROR in %s:\n%s\n"
-	,PR_GetString(pr_xfunction->s_name,s));
+	,PR_GetString(pr_xfunction->s_name),s);
 	ed = PROG_TO_EDICT(pr_global_struct->self);
 	ED_Print (ed);
 	ED_Free (ed);
