@@ -35,6 +35,22 @@ typedef unsigned char 		byte;
 #define max(a, b) ((a) > (b) ? (a) : (b))
 #endif
 
+/* min and max macros with type checking */
+#define qmax(a, b)           \
+    ({                       \
+        typeof(a) a_ = (a);  \
+        typeof(b) b_ = (b);  \
+        (void)(&a_ == &b_);  \
+        (a_ > b_) ? a_ : b_; \
+    })
+#define qmin(a, b)           \
+    ({                       \
+        typeof(a) a_ = (a);  \
+        typeof(b) b_ = (b);  \
+        (void)(&a_ == &b_);  \
+        (a_ < b_) ? a_ : b_; \
+    })
+
 typedef unsigned int qboolean;
 
 #define stringify__(x) #x

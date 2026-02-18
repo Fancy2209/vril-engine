@@ -34,6 +34,22 @@ typedef unsigned int qboolean;
 #define fmax(a, b) ((a) > (b) ? (a) : (b))
 #endif
 
+/* min and max macros with type checking */
+#define qmax(a, b)           \
+    ({                       \
+        typeof(a) a_ = (a);  \
+        typeof(b) b_ = (b);  \
+        (void)(&a_ == &b_);  \
+        (a_ > b_) ? a_ : b_; \
+    })
+#define qmin(a, b)           \
+    ({                       \
+        typeof(a) a_ = (a);  \
+        typeof(b) b_ = (b);  \
+        (void)(&a_ == &b_);  \
+        (a_ < b_) ? a_ : b_; \
+    })
+
 #define bound(a, b, c) ((a) >= (c) ? (a) : (b) < (a) ? (a) : (b) > (c) ? (c) : (b))
 
 //============================================================================
