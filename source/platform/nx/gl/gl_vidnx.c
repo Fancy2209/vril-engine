@@ -48,6 +48,7 @@ static EGLSurface s_surface;
 
 void GL_Init (void)
 {
+	nwindowSetDimensions(nwindowGetDefault(), 1920, 1080);
  // Connect to the EGL default display
     s_display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     if (!s_display)
@@ -116,8 +117,8 @@ void GL_Init (void)
 
     // Connect the context to the surface
     eglMakeCurrent(s_display, s_surface, s_surface, s_context);
-
 	eglSwapInterval(s_display, 1);
+	nwindowSetCrop(nwindowGetDefault(), 0, 0, 1920, 1080);
 
     int version = gladLoadGL(eglGetProcAddress);
     if (version == 0) {
@@ -150,8 +151,8 @@ void GL_Init (void)
 void GL_BeginRendering (int *x, int *y, int *width, int *height)
 {
 	*x = *y = 0;
-	*width = 1280;
-	*height = 720;
+	*width = 1920;
+	*height = 1080;
 }
 
 
@@ -279,8 +280,8 @@ void	VID_Init (unsigned char *palette)
 	if (vid.conwidth > width)
 		vid.conwidth = width;
 
-	vid.width = 1280;
-	vid.height = 720;
+	vid.width = 1920;
+	vid.height = 1080;
 
 	vid.aspect = ((float)vid.height / (float)vid.width);
 	vid.numpages = 2;
