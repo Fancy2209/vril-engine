@@ -1685,7 +1685,7 @@ void d8to24col (col_t colourv, int colour)
 
 __inline static void AddColoredParticle (part_type_t type, vec3_t org, int count, float size, float time, int colorStart, int colorLength, vec3_t dir)
 {
-	col_t		color;
+	col_t		color		= {0,0,0,0};
 	int		i, j, colorMod = 0;
 	float		tempSize;
 	particle_t	*p;
@@ -1796,7 +1796,7 @@ void QMB_Blood_Splat(part_type_t type, vec3_t org) //R00k :)
 void QMB_Blood_Splat(part_type_t type, vec3_t org) //Shpuldified
 {
 	int			j;
-	col_t		color;
+	col_t		color		= {0,0,0,0};
 	vec3_t		neworg, angle;
 
 	VectorClear (angle);
@@ -2164,7 +2164,7 @@ void QMB_MuzzleFlash(vec3_t org)
 
 void QMB_RocketTrail (vec3_t start, vec3_t end, trail_type_t type)
 {
-	col_t		color;
+	col_t		color		= {0,0,0,0};
 
 	switch (type)
 	{
@@ -2381,7 +2381,7 @@ void QMB_TeleportSplash (vec3_t org)
 {
 	int		i, j, k;
 	vec3_t		neworg, angle;
-	col_t		color;
+	col_t		color		= {0,0,0,0};
 
 	//QMB_Shockwave_Splash(org, 120);
 	for (i=-12 ; i<=12 ; i+=6)
@@ -2493,7 +2493,7 @@ void QMB_ShamblerCharge (vec3_t org)
 void QMB_LaserSight (void)
 {
 	float		frametime	= fabs(cl.time - cl.oldtime);
-	col_t		color;
+	col_t		color		= {0,0,0,0};
 	int			c;
 
 	extern cvar_t	r_laserpoint;
