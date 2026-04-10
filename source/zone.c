@@ -611,15 +611,6 @@ void *Z_Malloc (int size)
 	return buf;
 }
 
-// TODO: This is here temporarily, move to common.h when it is unified
-#define qmin(a, b)           \
-    ({                       \
-        typeof(a) a_ = (a);  \
-        typeof(b) b_ = (b);  \
-        (void)(&a_ == &b_);  \
-        (a_ < b_) ? a_ : b_; \
-    })
-
 /*
  * ========================
  * Z_Realloc
@@ -644,7 +635,7 @@ void *Z_Malloc (int size)
     Z_Free(ptr);
     ret = Z_TagMalloc(size, 1);
     if (!ret) Sys_Error("%s: failed on allocation of %i bytes", __func__, size);
-    if (ret != ptr) memmove(ret, ptr, qmin(orig_size, size));
+    if (ret != ptr) memmove(ret, ptr, min(orig_size, size));
     if (size > orig_size) memset((byte *)ret + orig_size, 0, size - orig_size);
     return ret;
 }

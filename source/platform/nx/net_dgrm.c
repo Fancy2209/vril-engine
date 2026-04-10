@@ -79,10 +79,8 @@ struct
 	byte			data[MAX_DATAGRAM];
 } packetBuffer;
 
-// TODO update with new menu stuff
-// when networking is added
 int m_return_state;
-extern int m_state;
+//extern int m_state;
 qboolean m_return_onerror;
 char m_return_reason[32];
 
@@ -1352,7 +1350,7 @@ ErrorReturn2:
 	if (m_return_onerror)
 	{
 		key_dest = key_menu;
-		m_state = m_return_state;
+		//m_state = m_return_state;
 		m_return_onerror = false;
 	}
 	return NULL;

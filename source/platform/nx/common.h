@@ -27,15 +27,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define max(a, b) ((a) > (b) ? (a) : (b))
 #endif
 
-/* min and max macros with type checking */
-#define qmax(a, b)           \
-    ({                       \
-        typeof(a) a_ = (a);  \
-        typeof(b) b_ = (b);  \
-        (void)(&a_ == &b_);  \
-        (a_ > b_) ? a_ : b_; \
-    })
-
 #define bound(a, b, c) ((a) >= (c) ? (a) : (b) < (a) ? (a) : (b) > (c) ? (c) : (b))
 
 #if !defined BYTE_DEFINED
@@ -79,7 +70,7 @@ void InsertLinkAfter (link_t *l, link_t *after);
 // (type *)STRUCT_FROM_LINK(link_t *link, type, member)
 // ent = STRUCT_FROM_LINK(link,entity_t,order)
 // FIXME: remove this mess!
-#define	STRUCT_FROM_LINK(l,t,m) ((t *)((byte *)l - (intptr_t)&(((t *)0)->m)))
+#define	STRUCT_FROM_LINK(l,t,m) ((t *)((byte *)l - (int)&(((t *)0)->m)))
 
 //============================================================================
 
