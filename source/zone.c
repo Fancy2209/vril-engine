@@ -611,6 +611,15 @@ void *Z_Malloc (int size)
 	return buf;
 }
 
+// TODO: This is here temporarily, move to common.h when it is unified
+#define qmin(a, b)           \
+    ({                       \
+        typeof(a) a_ = (a);  \
+        typeof(b) b_ = (b);  \
+        (void)(&a_ == &b_);  \
+        (a_ < b_) ? a_ : b_; \
+    })
+
 /*
  * ========================
  * Z_Realloc

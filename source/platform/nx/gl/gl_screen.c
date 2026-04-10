@@ -103,6 +103,8 @@ int      	hitmark;
 
 int			scr_fullupdate;
 
+int			ShowBlslogo;
+
 int			clearconsole;
 int			clearnotify;
 

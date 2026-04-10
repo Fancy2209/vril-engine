@@ -35,13 +35,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
         (void)(&a_ == &b_);  \
         (a_ > b_) ? a_ : b_; \
     })
-#define qmin(a, b)           \
-    ({                       \
-        typeof(a) a_ = (a);  \
-        typeof(b) b_ = (b);  \
-        (void)(&a_ == &b_);  \
-        (a_ < b_) ? a_ : b_; \
-    })
 
 #define bound(a, b, c) ((a) >= (c) ? (a) : (b) < (a) ? (a) : (b) > (c) ? (c) : (b))
 

@@ -225,8 +225,8 @@ void HUD_Init (void)
 	b_zlt = Image_LoadImage ("gfx/butticons/lshoulder", IMAGE_TGA, 0, true, false);
 	b_zrt = Image_LoadImage ("gfx/butticons/rshoulder", IMAGE_TGA, 0, true, false);
 	// TODO these need assets (plus/minus)
-	b_start = Image_LoadImage ("gfx/butticons/func_sta", IMAGE_TGA, 0, true, false);
-	b_select = Image_LoadImage ("gfx/butticons/func_sel", IMAGE_TGA, 0, true, false);
+	b_start = Image_LoadImage ("gfx/butticons/abutton", IMAGE_TGA, 0, true, false);
+	b_select = Image_LoadImage ("gfx/butticons/abutton", IMAGE_TGA, 0, true, false);
 #elif __WII__
 	b_abutton = Image_LoadImage ("gfx/butticons/abutton", IMAGE_TGA, 0, true, false);
 	b_bbutton = Image_LoadImage ("gfx/butticons/bbutton", IMAGE_TGA, 0, true, false);

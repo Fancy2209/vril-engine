@@ -1834,6 +1834,9 @@ void QMB_Blood_Splat(part_type_t type, vec3_t org) //Shpuldified
 
 void QMB_RunParticleEffect (vec3_t org, vec3_t dir, int col, int count)
 {
+	if (!r_runqmbparticles.value)
+		return;
+
 	col_t	color;
 	vec3_t	neworg, newdir;
 	int		i, j, particlecount;
@@ -2164,7 +2167,7 @@ void QMB_MuzzleFlash(vec3_t org)
 
 void QMB_RocketTrail (vec3_t start, vec3_t end, trail_type_t type)
 {
-	col_t		color		= {0,0,0,0};
+	col_t		color;
 
 	switch (type)
 	{
