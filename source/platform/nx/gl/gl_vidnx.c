@@ -284,6 +284,7 @@ void	VID_Init (unsigned char *palette)
 	vid.height = 1080;
 
 	vid.aspect = ((float)vid.height / (float)vid.width);
+	vid.scale = vid.height/STD_UI_HEIGHT;
 	vid.numpages = 2;
 
 	GL_Init();
