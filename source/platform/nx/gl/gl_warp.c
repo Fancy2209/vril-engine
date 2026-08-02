@@ -607,8 +607,7 @@ void R_DrawSkyBox (void)
 
 	for (i=0 ; i<5 ; i++)
 	{
-		const int vertex_count = 4;
-		glvert_t sky_vertices[vertex_count];
+		glvert_t sky_vertices[4];
 
 		// check if poly needs to be drawn at all
 		float dot = DotProduct(skynormals[i], vpn);
@@ -738,4 +737,3 @@ void R_InitSky (miptex_t *mt)
 	if (!alphaskytexture)
 		alphaskytexture = GL_LoadTexture("render_alphaskytexture", 128, 128, (byte *)trans, false, true, 1, true);
 }
-

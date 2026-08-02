@@ -465,7 +465,7 @@ void R_RenderBrushPoly (msurface_t *fa)
 	bool choosealpha = t->name[0] == '{' ? true : false; // naievil -- need to choose alpha mode for certain textures
 	if(choosealpha) {
 		glEnable(GL_ALPHA_TEST);
-		glAlphaFunc(GL_GREATER, 0xaa);
+		glAlphaFunc(GL_GREATER, 0.666);
 		glEnable(GL_MODULATE);
 		glColor4f(1, 1, 1, 1);
 	}
@@ -1387,4 +1387,3 @@ void GL_BuildLightmaps (void)
 		lightmap_index[i] = GL_LoadLMTexture (lm_name, BLOCK_WIDTH, BLOCK_HEIGHT, lightmaps+(i*BLOCK_WIDTH*BLOCK_HEIGHT*lightmap_bytes), false);
 	}
 }
-
