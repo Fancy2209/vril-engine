@@ -20,14 +20,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "../../nzportable_def.h"
 #include "errno.h"
-//#include "touch_ctr.h"
-//#include "circle_pad_pro.h"
 
+#include <SDL2/SDL.h>
 #include <switch.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
-//#define TICKS_PER_SEC 268123480.0
 
 // this is more than enough for the hunk
 #define QUAKE_HUNK_MB			20	 	// cypress -- usable quake hunk size in mB
@@ -160,7 +158,7 @@ void Sys_MakeCodeWriteable (unsigned long startaddr, unsigned long length)
 
 void Sys_PrintSystemInfo(void)
 {
-	Con_Printf ("NX NZP v%4.1f (NRO: "__TIME__" "__DATE__")\n", (double)(VERSION));
+	Con_Printf ("SWITCH NZP v%4.1f (NRO: "__TIME__" "__DATE__")\n", (double)(VERSION));
 }
 
 void Sys_SystemError(char *error)
@@ -196,7 +194,7 @@ void Sys_Printf (char *fmt, ...)
 void Sys_Quit (void)
 {
 	Host_Shutdown();
-
+	
 	//gfxExit();
 	exit(0);
 }
@@ -271,7 +269,7 @@ void Sys_SetKeys(u32 keys, u32 state){
 void Sys_SendKeyEvents (void)
 {
 	padUpdate(&pad);
-
+	
 	u32 kDown = padGetButtonsDown(&pad);
 	u32 kUp = padGetButtonsUp(&pad);
 
@@ -299,6 +297,7 @@ void Sys_CaptureScreenshot(void)
 bool game_running;
 int main (int argc, char **argv)
 {
+	SDL_Init(SDL_INIT_AUDIO);
 	static float time, oldtime;
 	static quakeparms_t parms;
 	new3ds_flag = true;
@@ -306,7 +305,7 @@ int main (int argc, char **argv)
 	padConfigureInput(1, HidNpadStyleSet_NpadStandard);
 	padInitializeDefault(&pad);
 	
-	chdir("/switch/nzportable");
+	chdir("sdmc:/3ds/nzportable");
 
 	if (new3ds_flag == true)
 		parms.memsize = QUAKE_HUNK_MB_NEW3DS * 1024 * 1024;
@@ -330,7 +329,8 @@ int main (int argc, char **argv)
 	{
 		time = Sys_FloatTime();
 		Host_Frame (time - oldtime);
+		music_update();
 		oldtime = time;
-	}
+	}	
 	return 0;
 }

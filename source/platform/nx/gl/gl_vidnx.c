@@ -125,6 +125,8 @@ void GL_Init (void)
         Sys_Error("Failed to initialize OpenGL context\n");
         return;
     }
+
+	glClearDepth (1.0f);
 	glClearColor ((float)(16/255),(float)(32/255),(float)(64/255),1);
 	glCullFace(GL_FRONT);
 	glEnable(GL_TEXTURE_2D);
@@ -283,7 +285,8 @@ void	VID_Init (unsigned char *palette)
 	vid.width = 1920;
 	vid.height = 1080;
 
-	vid.aspect = ((float)vid.height / (float)vid.width);
+	vid.aspect = ((float)vid.height / (float)vid.width) *
+				(320.0f / 240.0f);
 	vid.scale = vid.height/STD_UI_HEIGHT;
 	vid.numpages = 2;
 

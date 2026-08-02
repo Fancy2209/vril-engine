@@ -185,7 +185,7 @@ void Key_Console (int key)
 		Con_OSK_f(key_lines[edit_line]+1, consoleInput, 72);
 		return;
 	}
-#elif __3DS__
+#elif defined(__3DS__) || defined(__SWITCH__) 
 	if (key == K_SELECT) {
 		IN_SwitchKeyboard();
 		return;
