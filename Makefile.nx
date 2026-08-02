@@ -22,7 +22,7 @@ ICON		:= 	source/platform/nx/art/icon.jpg
 #---------------------------------------------------------------------------------
 ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 
-CFLAGS	:=	-g -Wall -Wdouble-promotion -std=gnu99 -g -O0 \
+CFLAGS	:=	-g -Wall -Wdouble-promotion -std=gnu99 -O3 \
 			-fomit-frame-pointer -ffunction-sections \
 			$(ARCH) $(DEFINES)
 
