@@ -482,7 +482,6 @@ void Draw_ColoredStretchPic (int x, int y, int pic, int x_value, int y_value, in
 		glVertex2f (x, y+y_value);
 		glEnd ();
 		glDisable(GL_BLEND);
-		glEnable(GL_ALPHA_TEST);
 		glColor4f(1,1,1,1);
 	}
 }
@@ -574,7 +573,7 @@ void Draw_ColorPic (int x, int y, int pic, float r, float g , float b, float a)
 		glEnd ();
 
 		glDisable(GL_BLEND);
-		glEnable(GL_ALPHA_TEST);
+		glDisable(GL_ALPHA_TEST);
 		glColor4f(1,1,1,1);
 	}
 }
