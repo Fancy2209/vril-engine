@@ -737,3 +737,4 @@ void R_InitSky (miptex_t *mt)
 	if (!alphaskytexture)
 		alphaskytexture = GL_LoadTexture("render_alphaskytexture", 128, 128, (byte *)trans, false, true, 1, true);
 }
+
