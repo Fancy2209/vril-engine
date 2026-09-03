@@ -9,6 +9,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 #define MAX_HANDLES 32
 #define DEFAULT_MEMORY_MB 128
 
@@ -37,6 +41,7 @@ static int Sys_FileLength(FILE *file)
 
 int Sys_FileOpenRead(char *path, int *handle)
 {
+	printf("Sys_FileOpenRead(%s, %p)\n", path, handle);
 	FILE *file = fopen(path, "rb");
 	int index;
 	if (!file) { *handle = -1; return -1; }
@@ -65,6 +70,8 @@ int Sys_FileTime(char *path) {
 	#if defined(_WIN32)
 	struct _stat st;
 	return _stat(path, &st) == 0 ? (int)st.st_mtime : -1;
+	#elif defined(__EMSCRIPTEN__)
+	return 1;
 	#else
 	struct stat st;
 	return stat(path, &st) == 0 ? (int)st.st_mtime : -1;
@@ -83,7 +90,11 @@ void Sys_MakeCodeWriteable(unsigned long startaddr, unsigned long length) { (voi
 void Sys_PrintSystemInfo(void) { Con_Printf("Vril Engine SDL (%s)\n", SDL_GetPlatform()); }
 void Sys_Printf(char *fmt, ...) { va_list args; va_start(args, fmt); vfprintf(stdout, fmt, args); va_end(args); }
 void Sys_SystemError(char *error) { fprintf(stderr, "Vril Engine: %s\n", error); SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Vril Engine", error, sdl_window); SDL_Quit(); exit(1); }
+#ifndef __EMSCRIPTEN__
 void Sys_Quit(void) { sdl_running = false; }
+#else
+void Sys_Quit(void) { emscripten_cancel_main_loop(); }
+#endif
 double Sys_FloatTime(void) { static Uint64 start; Uint64 now = SDL_GetPerformanceCounter(); if (!start) start = now; return (double)(now - start) / SDL_GetPerformanceFrequency(); }
 char *Sys_ConsoleInput(void) { return NULL; }
 void Sys_Sleep(void) { SDL_Delay(1); }
@@ -274,6 +285,14 @@ void Sys_SendKeyEvents(void)
 	SDL_SetRelativeMouseMode((key_dest == key_game && SDL_GetKeyboardFocus() == sdl_window) ? SDL_TRUE : SDL_FALSE);
 }
 
+static double oldtime;
+static void mainloop(void) {
+		double now = Sys_FloatTime();
+		Host_Frame(now - oldtime);
+		music_update();
+		oldtime = now;
+}
+
 int main(int argc, char **argv)
 {
 	quakeparms_t parms;
@@ -281,7 +300,6 @@ int main(int argc, char **argv)
 	const char *base_directory;
 	char startup_error[256];
 	size_t heap_size;
-	double oldtime;
 	qboolean headless_test;
 	memset(&parms, 0, sizeof(parms));
 	if (!Startup_LoadArguments(&startup, argc, argv, "setup.ini",
@@ -289,7 +307,7 @@ int main(int argc, char **argv)
 		fprintf(stderr, "Startup: %s\n", startup_error);
 		return 1;
 	}
-	if (!Startup_GetBaseDirectory(&startup, ".", &base_directory,
+	if (!Startup_GetBaseDirectory(&startup, "/", &base_directory,
 		startup_error, sizeof(startup_error))) {
 		fprintf(stderr, "Startup: %s\n", startup_error);
 		Startup_FreeArguments(&startup);
@@ -317,12 +335,14 @@ int main(int argc, char **argv)
 	parms.argv = com_argv;
 	Host_Init(&parms);
 	oldtime = Sys_FloatTime();
+#ifndef __EMSCRIPTEN__
 	while (sdl_running) {
-		double now = Sys_FloatTime();
-		Host_Frame(now - oldtime);
-		music_update();
-		oldtime = now;
+		mainloop();
 	}
+#else
+	// Passing true prevents the code below from being reached
+	emscripten_set_main_loop(mainloop, 60, true);
+#endif
 	if (host_initialized)
 		Host_Shutdown();
 	free(parms.membase);
