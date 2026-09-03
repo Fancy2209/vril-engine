@@ -121,9 +121,7 @@ static void Check_Gamma(unsigned char *pal)
 	}
 	memcpy(pal, adjusted, sizeof(adjusted));
 }
-#ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-#endif
+
 void VID_Init(unsigned char *palette)
 {
 	int parameter;
@@ -143,8 +141,6 @@ void VID_Init(unsigned char *palette)
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
-#else 
-	EM_ASM("Module.useWebGL = true; GLImmediate.init();");
 #endif
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);

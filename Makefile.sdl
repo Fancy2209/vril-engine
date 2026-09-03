@@ -32,8 +32,8 @@ ifeq ($(findstring wasm32,$(TARGET_TRIPLE)),)
 LDLIBS := $(shell $(PKG_CONFIG) --libs sdl2) -lSDL2_mixer
 else
 # no --embed-file $HOME/nzp@nzp cause we don't want to do that here
-LDLIBS := -sUSE_SDL=2 -s USE_SDL_MIXER=2 -sSDL2_MIXER_FORMATS='["mp3"]' -sINITIAL_MEMORY=256mb -sSTACK_SIZE=1mb -sLEGACY_GL_EMULATION -sGL_FFP_ONLY -gsource-map
-CFLAGS += -sUSE_SDL=2 -s USE_SDL_MIXER=2 -sSDL2_MIXER_FORMATS='["mp3"]' -gsource-map
+LDLIBS := -sUSE_SDL=2 -sUSE_SDL_MIXER=2 -sSDL2_MIXER_FORMATS='["mp3"]' -sINITIAL_MEMORY=256mb -sSTACK_SIZE=1mb -sLEGACY_GL_EMULATION -sGL_FFP_ONLY -gsource-map
+CFLAGS += -sUSE_SDL=2 -sUSE_SDL_MIXER=2 -sSDL2_MIXER_FORMATS='["mp3"]' -gsource-map
 endif
 LDLIBS +=  -lm
 ifneq ($(findstring mingw,$(TARGET_TRIPLE)),)

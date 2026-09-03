@@ -34,7 +34,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <arpa/inet.h>
 #endif
 
+#ifdef __EMSCRIPTEN__
+#include <fcntl.h>
+#else
 #include <sys/fcntl.h>
+#endif
 #include <unistd.h>
 
 extern cvar_t hostname;
