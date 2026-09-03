@@ -348,11 +348,7 @@ void DrawGLPoly (glpoly_t *p)
 	int		i;
 	float	*v;
 
-	#ifdef __EMSCRIPTEN__
 	glBegin (GL_TRIANGLE_FAN);
-	#else
-	glBegin (GL_POLYGON);
-	#endif
 	v = p->verts[0];
 	for (i=0 ; i<p->numverts ; i++, v+= VERTEXSIZE)
 	{
@@ -369,11 +365,7 @@ void DrawGLPolyLightmap (glpoly_t *p)
 	float	*v;
 	vec3_t	nv;
 
-	#ifdef __EMSCRIPTEN__
 	glBegin (GL_TRIANGLE_FAN);
-	#else
-	glBegin (GL_POLYGON);
-	#endif
 	v = p->verts[0];
 	for (i=0 ; i<p->numverts ; i++, v+= VERTEXSIZE)
 	{
