@@ -41,7 +41,6 @@ static int Sys_FileLength(FILE *file)
 
 int Sys_FileOpenRead(char *path, int *handle)
 {
-	printf("Sys_FileOpenRead(%s, %p)\n", path, handle);
 	FILE *file = fopen(path, "rb");
 	int index;
 	if (!file) { *handle = -1; return -1; }
@@ -61,7 +60,12 @@ int Sys_FileOpenWrite(char *path)
 	return index;
 }
 
-void Sys_FileClose(int handle) { fclose(sys_handles[handle]); sys_handles[handle] = NULL; }
+void Sys_FileClose(int handle) { 
+	#ifndef __EMSCRIPTEN__ // this crashes the whole app on emscripten saying it's null
+	fclose(sys_handles[handle]); 
+	#endif
+	sys_handles[handle] = NULL; 
+}
 void Sys_FileSeek(int handle, int position) { fseek(sys_handles[handle], position, SEEK_SET); }
 int Sys_FileRead(int handle, void *dest, int count) { return (int)fread(dest, 1, count, sys_handles[handle]); }
 int Sys_FileWrite(int handle, void *data, int count) { return (int)fwrite(data, 1, count, sys_handles[handle]); }
@@ -71,7 +75,16 @@ int Sys_FileTime(char *path) {
 	struct _stat st;
 	return _stat(path, &st) == 0 ? (int)st.st_mtime : -1;
 	#elif defined(__EMSCRIPTEN__)
-	return 1;
+	FILE    *f;
+	
+	f = fopen(path, "rb");
+	if (f)
+	{
+		fclose(f);
+		return 1;
+	}
+	
+	return -1;
 	#else
 	struct stat st;
 	return stat(path, &st) == 0 ? (int)st.st_mtime : -1;
@@ -307,7 +320,7 @@ int main(int argc, char **argv)
 		fprintf(stderr, "Startup: %s\n", startup_error);
 		return 1;
 	}
-	if (!Startup_GetBaseDirectory(&startup, "/", &base_directory,
+	if (!Startup_GetBaseDirectory(&startup, ".", &base_directory,
 		startup_error, sizeof(startup_error))) {
 		fprintf(stderr, "Startup: %s\n", startup_error);
 		Startup_FreeArguments(&startup);

@@ -345,7 +345,7 @@ void Draw_CharacterRGBA(int x, int y, int num, float r, float g, float b, float 
 	glEnable(GL_BLEND);
 	glColor4f(r/255, g/255, b/255, a/255);
 	glDisable (GL_ALPHA_TEST);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 	glBegin (GL_QUADS);
 	glTexCoord2f (fcol, frow);
@@ -359,7 +359,7 @@ void Draw_CharacterRGBA(int x, int y, int num, float r, float g, float b, float 
 	glEnd ();
 	
 	glColor4f(1,1,1,1);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glEnable(GL_ALPHA_TEST);
 	glDisable (GL_BLEND);
 }
@@ -464,7 +464,7 @@ void Draw_ColoredStretchPic (int x, int y, int pic, int x_value, int y_value, in
 		glDisable(GL_ALPHA_TEST);
 		glColor4f(r/255.0f,g/255.0f,b/255.0f,a/255.0f);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 		GL_Bind2D (pic);
 		glBegin (GL_QUADS);
@@ -552,7 +552,7 @@ void Draw_ColorPic (int x, int y, int pic, float r, float g , float b, float a)
 		glEnable(GL_BLEND);
 		glColor4f(r/255.0f,g/255.0f,b/255.0f,a/255.0f);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 		gltexture_t *glt = &gltextures[pic];
 		GL_Bind2D (glt->texnum);
@@ -586,7 +586,7 @@ void Draw_SubPic (int x, int y, int pic, float s, float t, float s_coord_size, f
 		glEnable(GL_BLEND);
 		glColor4f(r/255.0f,g/255.0f,b/255.0f,a/255.0f);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 		gltexture_t *glt = &gltextures[pic];
 		GL_Bind2D (glt->texnum);
@@ -997,7 +997,7 @@ int GL_LoadTexture (char *identifier, int width, int height, byte *data, qboolea
 	else {
 		Sys_Error("GL_LoadTexture: unknown bytesperpixel\n");
 	}
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 	numgltextures++;
 
@@ -1068,7 +1068,7 @@ int GL_LoadLMTexture (char *identifier, int width, int height, byte *data, qbool
 		}
 	}
 
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 	return texture_index;
 }

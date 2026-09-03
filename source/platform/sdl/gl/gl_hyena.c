@@ -23,7 +23,7 @@ Hyena_ResolveCapability(int capability)
 void
 Hyena_SetTextureMode(int mode)
 {
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,
       mode == HYE_MODULATE ? GL_MODULATE : GL_REPLACE);
 }
 

@@ -809,7 +809,7 @@ void R_DrawZombieLimb (entity_t *e, int which)
 
 	if (gl_smoothmodels.value)
 		glShadeModel (GL_SMOOTH);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 	if (gl_affinemodels.value)
 		glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
@@ -817,7 +817,7 @@ void R_DrawZombieLimb (entity_t *e, int which)
 	IgnoreInterpolatioFrame(e, paliashdr);
 	R_SetupAliasBlendedFrame (currententity->frame, paliashdr, e);
 
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
 	glShadeModel (GL_FLAT);
 	if (gl_affinemodels.value)
@@ -924,7 +924,7 @@ void R_DrawTransparentAliasModel (entity_t *e)
 	glDisable (GL_ALPHA_TEST);
 	glDepthMask(GL_FALSE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 	if (gl_affinemodels.value)
 		glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
@@ -932,7 +932,7 @@ void R_DrawTransparentAliasModel (entity_t *e)
 	IgnoreInterpolatioFrame(e, paliashdr);
 	R_SetupAliasBlendedFrame (currententity->frame, paliashdr, e);
 
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);
 
@@ -1160,7 +1160,7 @@ void R_DrawAliasModel (entity_t *e)
 	if (gl_smoothmodels.value)
 		glShadeModel (GL_SMOOTH);
 
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 	if (gl_affinemodels.value)
 		glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
@@ -1168,7 +1168,7 @@ void R_DrawAliasModel (entity_t *e)
 	IgnoreInterpolatioFrame(e, paliashdr);
 	R_SetupAliasBlendedFrame (currententity->frame, paliashdr, e);
 
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
 	glShadeModel (GL_FLAT);
 	if (gl_affinemodels.value)

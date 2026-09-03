@@ -205,7 +205,11 @@ void EmitWaterPolys (msurface_t *fa)
 
 	for (p=fa->polys ; p ; p=p->next)
 	{
+		#ifdef __EMSCRIPTEN__
+		glBegin (GL_TRIANGLE_FAN);
+		#else
 		glBegin (GL_POLYGON);
+		#endif
 		for (i=0,v=p->verts[0] ; i<p->numverts ; i++, v+=VERTEXSIZE)
 		{
 			os = v[3];
@@ -243,7 +247,11 @@ void EmitSkyPolys (msurface_t *fa)
 
 	for (p=fa->polys ; p ; p=p->next)
 	{
+		#ifdef __EMSCRIPTEN__
+		glBegin (GL_TRIANGLE_FAN);
+		#else
 		glBegin (GL_POLYGON);
+		#endif
 		for (i=0,v=p->verts[0] ; i<p->numverts ; i++, v+=VERTEXSIZE)
 		{
 			VectorSubtract (v, r_origin, dir);
@@ -280,10 +288,12 @@ void EmitFlatSkyPolys (msurface_t *fa)
 		glpoly_t *poly;
 		for (poly = surface->polys; poly; poly = poly->next)
 		{
+#ifndef __EMSCRIPTEN__
 			glBegin(GL_POLYGON);
 			for (int i = 0; i < poly->numverts; i++)
 				glVertex3fv(poly->verts[i]);
 			glEnd();
+#endif
 		}
 	}
 
@@ -629,7 +639,7 @@ void R_DrawSkyBox (void)
 
 	glDisable(GL_BLEND);
 	glDisable(GL_ALPHA_TEST);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glDepthMask(GL_FALSE);
 	glDisable(GL_DEPTH_TEST);
 

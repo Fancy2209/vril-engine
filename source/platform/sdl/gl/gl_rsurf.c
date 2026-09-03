@@ -348,7 +348,11 @@ void DrawGLPoly (glpoly_t *p)
 	int		i;
 	float	*v;
 
+	#ifdef __EMSCRIPTEN__
+	glBegin (GL_TRIANGLE_FAN);
+	#else
 	glBegin (GL_POLYGON);
+	#endif
 	v = p->verts[0];
 	for (i=0 ; i<p->numverts ; i++, v+= VERTEXSIZE)
 	{
@@ -365,7 +369,11 @@ void DrawGLPolyLightmap (glpoly_t *p)
 	float	*v;
 	vec3_t	nv;
 
+	#ifdef __EMSCRIPTEN__
+	glBegin (GL_TRIANGLE_FAN);
+	#else
 	glBegin (GL_POLYGON);
+	#endif
 	v = p->verts[0];
 	for (i=0 ; i<p->numverts ; i++, v+= VERTEXSIZE)
 	{
@@ -575,7 +583,7 @@ void R_DrawWaterSurfaces (void)
 
 	glEnable (GL_BLEND);
 	glColor4f (1,1,1,r_wateralpha.value);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 	for (i=0 ; i<cl.worldmodel->numtextures ; i++)
 	{
@@ -597,7 +605,7 @@ void R_DrawWaterSurfaces (void)
 		t->texturechain = NULL;
 	}
 
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
 	glColor4f (1,1,1,1);
 	glDisable (GL_BLEND);
@@ -626,7 +634,7 @@ void R_DrawWaterSurfaces (void)
 	if (r_wateralpha.value < 1.0f) {
 		glEnable (GL_BLEND);
 		glColor4f (1,1,1,r_wateralpha.value);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	}
 
 	if (!gl_texsort.value) {
@@ -665,7 +673,7 @@ void R_DrawWaterSurfaces (void)
 	}
 
 	if (r_wateralpha.value < 1.0f) {
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
 		glColor4f (1,1,1,1);
 		glDisable (GL_BLEND);
